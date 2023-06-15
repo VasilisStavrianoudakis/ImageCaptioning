@@ -6,21 +6,26 @@ from typing import Iterator, Tuple
 import numpy as np
 import pandas as pd
 import torch
-from models import Decoder, Encoder, ImageCaptioningModel
-
-# from PIL import Image
-from plotter import plot_info
+from PIL import Image
 from sklearn.model_selection import train_test_split
 from torchmetrics.functional import bleu_score
 
 # from torchmetrics.functional.text.rouge import rouge_score
 from torchtext.vocab import build_vocab_from_iterator
 from torchtext.vocab.vocab import Vocab
-
-# from torchvision import transforms
+from torchvision import transforms
 from tqdm import tqdm
-from utils import open_json  # preprocess_image,
-from utils import CustomDataLoader, preprocess_texts, tokens_generator, write_json
+
+from models import Decoder, Encoder, ImageCaptioningModel
+from plotter import plot_info
+from utils import (
+    CustomDataLoader,
+    open_json,
+    preprocess_image,
+    preprocess_texts,
+    tokens_generator,
+    write_json,
+)
 
 
 def eval_model(
@@ -123,7 +128,9 @@ if __name__ == "__main__":
     ]
 
     # Split the data.
-    training_set, rest = train_test_split(image_captions, test_size=0.3, random_state=1)
+    training_set, rest = train_test_split(
+        image_captions, test_size=0.125, random_state=1
+    )
     validation_set, test_set = train_test_split(rest, test_size=0.5, random_state=1)
     del rest, image_captions
 
@@ -143,27 +150,44 @@ if __name__ == "__main__":
         captions=training_set["caption"].tolist(),
         vocab=vocab,
         do_shuffle=True,
-        batch_size=16,
+        batch_size=config["batch_size"],
     )
     validation_loader = CustomDataLoader(
         images_paths=validation_set["image"].tolist(),
         captions=validation_set["caption"].tolist(),
         vocab=vocab,
         do_shuffle=False,
-        batch_size=16,
+        batch_size=config["batch_size"],
     )
     test_loader = CustomDataLoader(
         images_paths=test_set["image"].tolist(),
         captions=test_set["caption"].tolist(),
         vocab=vocab,
         do_shuffle=False,
-        batch_size=16,
+        batch_size=config["batch_size"],
     )
 
     # Init the models, optimizer and loss function
     encoder = Encoder().to(device)
     decoder = Decoder(**config["decoder_params"]).to(device)
     model = ImageCaptioningModel(encoder=encoder, decoder=decoder).to(device)
+
+    # Only finetune the CNN
+    for name, param in model.named_parameters():
+        print(name, param.requires_grad)
+        if (
+            "encoder.inception.Conv2d" in name
+            or "encoder.inception.Mixed" in name
+            or "encoder.inception.AuxLogits" in name
+        ):
+            param.requires_grad = False
+            print(name, param.requires_grad)
+        # else:
+        #     param.requires_grad = train_CNN
+
+    # for name, param in model.named_parameters():
+    #     print(name, param.requires_grad)
+    # exit()
 
     loss_function = torch.nn.CrossEntropyLoss(ignore_index=vocab["<PAD>"])
     optimizer = torch.optim.Adam(
@@ -182,7 +206,8 @@ if __name__ == "__main__":
     events = {}
     print("Training in:", device)
     for epoch in tqdm(range(config["epochs"]), desc="Epoch"):
-        for batch in tqdm(training_loader, leave=False):
+        model.train()
+        for batch in tqdm(training_loader, desc="Training", leave=False):
             optimizer.zero_grad()
 
             images, true_captions, model_captions, lengths = batch
@@ -223,6 +248,7 @@ if __name__ == "__main__":
             f"Epoch {epoch}, mean training loss {training_loss:.2f}, mean val loss {validation_loss:.2f}, training bleu: {round(training_score, 3)}, validation blue: {round(validation_score, 3)}"
         )
         if validation_score > max_val_score:
+            events["best_model"] = epoch
             print(
                 f" *** Saving best model. Best validation bleu: {max_val_score} -> {validation_score}"
             )
@@ -253,7 +279,7 @@ if __name__ == "__main__":
         else:
             num_epochs_without_improvement += 1
 
-        if patience != -1 and num_epochs_without_improvement >= patience:
+        if patience > 0 and num_epochs_without_improvement >= patience:
             print(
                 f"##### Stopping the training phase because there was not any improvement in the last {patience} epochs."
             )
@@ -289,7 +315,7 @@ if __name__ == "__main__":
     del vocab
     vocab = torch.load(os.path.join(model_path, vocab_name))
 
-    test_loss, test_score = eval_model(
+    test_score, test_loss = eval_model(
         model=model,
         dataloader=test_loader,
         vocab=vocab,
@@ -298,16 +324,17 @@ if __name__ == "__main__":
         device=device,
     )
 
-    print(f"Test loss: {test_loss}, Test bleu: {round(test_score, 3)}")
+    print(f"Test loss: {round(test_loss, 3)}, Test bleu: {round(test_score, 3)}")
 
-    # img = Image.open(training_set.iloc[0]["image"]).convert("RGB")
-    # img = preprocess_image(img)
+    img = Image.open(training_set.iloc[0]["image"]).convert("RGB")
+    img = preprocess_image(img).to(device)
+    print(img.shape)
 
-    # c = model.caption_image(image=img, vocab=vocab, max_length=15)
-    # print("EDWWWWWWWWWWWWWWWWW")
-    # print(c)
+    model.eval()
+    c = model.caption_image(image=img, vocab=vocab, max_length=15)
+    print("EDWWWWWWWWWWWWWWWWW")
+    print(c)
 
     # img = img.squeeze(0)
     # img = transforms.ToPILImage()(img)
     # img.show()
-    # exit()

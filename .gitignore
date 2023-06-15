@@ -1,4 +1,6 @@
 data
+flickr8k.zip
+inference
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
