@@ -1,0 +1,12 @@
+{
+    "epochs": 10,
+    "lr": 2e-4,
+    "weight_decay": 1e-5,
+    "patience": 0,
+    "decoder_params": {
+        "embed_size": 1600,
+        "hidden_size": 512,
+        "num_layers": 1,
+        "p": 0.5
+    }
+}

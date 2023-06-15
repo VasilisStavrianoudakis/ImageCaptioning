@@ -1,14 +1,24 @@
-import re
+import json
 from math import ceil
 from typing import Any, Dict, List, Tuple, Union
 
-import pandas as pd
 import torch
 from PIL import Image
 from sklearn.utils import shuffle
 from torch.nn.utils.rnn import pad_sequence
 from torchtext.vocab.vocab import Vocab
 from torchvision import transforms
+
+
+def write_json(filepath: str, data: Any):
+    with open(filepath, "w", encoding="utf8") as fp:
+        json.dump(data, fp, indent=4, ensure_ascii=False)
+
+
+def open_json(filepath: str) -> Any:
+    with open(filepath, "r", encoding="utf8") as fp:
+        data = json.load(fp)
+    return data
 
 
 def tokens_generator(texts: List[str]):
@@ -24,7 +34,7 @@ def preprocess_texts(captions: List[str]) -> List[str]:
     return captions
 
 
-def preprocess_images(image):
+def preprocess_image(image: Image.Image) -> torch.Tensor:
     transform = transforms.Compose(
         [
             transforms.Resize((256, 256)),
@@ -33,6 +43,7 @@ def preprocess_images(image):
         ]
     )
     image = transform(image)
+    image = image.unsqueeze(0)
     return image
 
 
@@ -90,15 +101,21 @@ class CustomDataLoader:
             Image.open(img).convert("RGB")
             for img in self.images_paths[self.current_index : end]
         ]
-        imgs = [preprocess_images(img) for img in imgs]
-        imgs = [img.unsqueeze(0) for img in imgs]
+        imgs = [preprocess_image(img) for img in imgs]
+        # imgs = [img.unsqueeze(0) for img in imgs]
         imgs = torch.cat(imgs, dim=0)
+        # print(imgs.shape)
 
-        captions = [caption for caption in self.captions[self.current_index : end]]
-        lengths = [len(caption) for caption in captions]
-        captions = pad_sequence(captions, batch_first=True)
-        # captions = torch.tensor(captions)
+        true_captions = [caption for caption in self.captions[self.current_index : end]]
+        lengths = [len(caption) for caption in true_captions]
+        true_captions = [torch.LongTensor(caption) for caption in true_captions]
+
+        # Remove the full stop because we want the model to stop generating after this.
+        model_captions = [caption[:-1] for caption in true_captions]
+        model_captions = pad_sequence(model_captions, batch_first=True)
+
+        true_captions = pad_sequence(true_captions, batch_first=True)
 
         self.current_index = end
 
-        return imgs, captions, lengths
+        return imgs, true_captions, model_captions, lengths

@@ -3,3 +3,6 @@ torchvision
 torchtext
 pandas==2.0.2
 scikit-learn==1.2.2
+torchmetrics==0.11.4
+nltk==3.8.1
+matplotlib==3.7.1
