@@ -4,8 +4,10 @@
     "lr": 2e-3,
     "weight_decay": 0,
     "patience": -1,
+    "pretrained": true,
+    "freeze": true,
     "decoder_params": {
-        "embed_size": 1600,
+        "embed_size": 300,
         "hidden_size": 2048,
         "num_layers": 2,
         "p": 0.5

@@ -1,3 +1,4 @@
+import math
 from typing import Dict, Iterator, List, Optional, Tuple, Union
 
 import torch
@@ -7,63 +8,102 @@ from torchtext.vocab.vocab import Vocab
 
 
 class Encoder(nn.Module):
-    def __init__(self, in_channels: int = 3, p: float = 0.5):
+    def __init__(
+        self,
+        img_size: int = 256,
+        in_channels: int = 3,
+        embed_size: int = -1,
+        dropout_prob: float = 0.5,
+    ):
         super().__init__()
-        # out_channels = 8
-        # m = 1
-        # self.CONV1 = nn.Conv2d(
-        #     in_channels=in_channels,
-        #     out_channels=out_channels,
-        #     kernel_size=7,
-        #     stride=1,
-        #     padding=1,
-        # )
-        # self.max_pool1 = nn.MaxPool2d(kernel_size=5, stride=2, padding=0)
+        output_calc = lambda i, k, p, s: int(math.floor(((i + 2 * p - k) / s) + 1))
+        out_channels = 16
+        m = 1
+        k = 7
+        s = 1
+        p = 1
+        self.CONV1 = nn.Conv2d(
+            in_channels=in_channels,
+            out_channels=out_channels,
+            kernel_size=k,
+            stride=s,
+            padding=p,
+        )
+        out_dim = output_calc(i=img_size, k=k, p=p, s=s)
+        k = 5
+        s = 2
+        p = 1
+        self.max_pool1 = nn.MaxPool2d(kernel_size=k, stride=s, padding=p)
+        out_dim = output_calc(i=out_dim, k=k, p=p, s=s)
 
-        # m *= 2
-        # in_channels = out_channels
-        # out_channels = m * out_channels
-        # self.CONV2 = nn.Conv2d(
-        #     in_channels=in_channels,
-        #     out_channels=out_channels,
-        #     kernel_size=5,
-        #     stride=2,
-        #     padding=1,
-        # )
-        # self.max_pool2 = nn.MaxPool2d(kernel_size=5, stride=2, padding=0)
+        m *= 2
+        in_channels = out_channels
+        out_channels = m * out_channels
+        k = 5
+        s = 1
+        p = 1
+        self.CONV2 = nn.Conv2d(
+            in_channels=in_channels,
+            out_channels=out_channels,
+            kernel_size=k,
+            stride=s,
+            padding=p,
+        )
+        out_dim = output_calc(i=out_dim, k=k, p=p, s=s)
+        k = 5
+        s = 2
+        p = 1
+        self.max_pool2 = nn.MaxPool2d(kernel_size=k, stride=s, padding=p)
+        out_dim = output_calc(i=out_dim, k=k, p=p, s=s)
 
-        # m *= 2
-        # in_channels = out_channels
-        # out_channels = m * out_channels
-        # self.CONV3 = nn.Conv2d(
-        #     in_channels=in_channels,
-        #     out_channels=out_channels,
-        #     kernel_size=3,
-        #     stride=2,
-        #     padding=1,
-        # )
-        # self.max_pool3 = nn.MaxPool2d(kernel_size=3, stride=3, padding=0)
-        self.inception = models.inception_v3(pretrained=True, aux_logits=True)
-        self.inception.fc = nn.Linear(self.inception.fc.in_features, 1600)
+        m *= 2
+        in_channels = out_channels
+        out_channels = m * out_channels
+        k = 3
+        s = 1
+        p = 1
+        self.CONV3 = nn.Conv2d(
+            in_channels=in_channels,
+            out_channels=out_channels,
+            kernel_size=k,
+            stride=s,
+            padding=p,
+        )
+        out_dim = output_calc(i=out_dim, k=k, p=p, s=s)
+        k = 5
+        s = 2
+        p = 1
+        self.max_pool3 = nn.MaxPool2d(kernel_size=k, stride=s, padding=p)
+        out_dim = output_calc(i=out_dim, k=k, p=p, s=s)
+
+        self.embed_size = embed_size
+        if embed_size > 0:
+            fc_in = out_channels * out_dim
+            self.FC = nn.Linear(fc_in, embed_size)
+
+        # self.inception = models.inception_v3(pretrained=True, aux_logits=True)
+        # self.inception.fc = nn.Linear(self.inception.fc.in_features, 1600)
 
         self.activation_function = nn.ReLU()
-        self.dropout = nn.Dropout(p=p)
+        self.dropout = nn.Dropout(p=dropout_prob)
 
     def forward(self, images):
-        # x = self.activation_function(self.CONV1(images))
-        # x = self.max_pool1(x)
-        # x = self.activation_function(self.CONV2(x))
-        # x = self.max_pool2(x)
-        # x = self.activation_function(self.CONV3(x))
-        # x = self.max_pool3(x)
-        # x = torch.flatten(x, start_dim=1)
+        x = self.activation_function(self.CONV1(images))
+        x = self.max_pool1(x)
+        x = self.activation_function(self.CONV2(x))
+        x = self.max_pool2(x)
+        x = self.activation_function(self.CONV3(x))
+        x = self.max_pool3(x)
+        x = torch.flatten(x, start_dim=1)
+        if self.embed_size > 0:
+            x = self.activation_function(self.FC(x))
 
-        x = self.inception(images)
-        try:
-            x = x.logits
-        except AttributeError:
-            pass
-        x = self.activation_function(x)
+        # x = self.inception(images)
+        # try:
+        #     x = x.logits
+        # except AttributeError:
+        #     pass
+        # x = self.activation_function(x)
 
         # print(x.shape)
         return x
@@ -76,7 +116,7 @@ class Decoder(nn.Module):
         hidden_size: int,
         vocab_size: int,
         num_layers: int,
-        p: float = 0.5,
+        dropout_prob: float = 0.5,
     ):
         super().__init__()
         self.EMBEDDING_LAYER = nn.Embedding(
@@ -90,7 +130,7 @@ class Decoder(nn.Module):
             bidirectional=False,
         )
         self.FC = nn.Linear(hidden_size, vocab_size)
-        self.dropout = nn.Dropout(p=p)
+        self.dropout = nn.Dropout(p=dropout_prob)
 
     def forward(
         self, features: torch.Tensor, captions: torch.LongTensor, lengths: List[int]

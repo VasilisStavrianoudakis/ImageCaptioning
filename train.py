@@ -9,23 +9,18 @@ import torch
 from PIL import Image
 from sklearn.model_selection import train_test_split
 from torchmetrics.functional import bleu_score
-
 # from torchmetrics.functional.text.rouge import rouge_score
-from torchtext.vocab import build_vocab_from_iterator
+from torchtext.vocab import GloVe, build_vocab_from_iterator
 from torchtext.vocab.vocab import Vocab
 from torchvision import transforms
 from tqdm import tqdm
 
 from models import Decoder, Encoder, ImageCaptioningModel
 from plotter import plot_info
-from utils import (
-    CustomDataLoader,
-    open_json,
-    preprocess_image,
-    preprocess_texts,
-    tokens_generator,
-    write_json,
-)
+from utils import (CustomDataLoader, freeze_or_unfreeze_layers, get_data,
+                   get_pretrained_emb, open_json, preprocess_image,
+                   preprocess_texts, tokens_generator, unfreeze_model,
+                   write_json)
 
 
 def eval_model(
@@ -90,11 +85,14 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     script_path = Path(__file__).resolve().parent
     data_path = os.path.join(script_path, "data")
-    images_paths = os.path.join(data_path, "Images")
+    output_path = os.path.join(data_path, "csv")
+    images_path = os.path.join(data_path, "Images")
     captions_path = os.path.join(data_path, "captions.txt")
 
+    config = open_json(filepath=os.path.join(script_path, "config.json"))
+
     inference_path = "inference"
-    pretrained = False
+    pretrained = config["pretrained"]
     suffix = "pretrained" if pretrained else "end2end"
     checkpoint_name = "checkpoint.pt"
     vocab_name = "vocab.pt"
@@ -104,35 +102,12 @@ if __name__ == "__main__":
     )
     figs_path = os.path.join(model_path, "figs")
 
-    image_captions = pd.read_csv(captions_path)
-    config = open_json(filepath=os.path.join(script_path, "config.json"))
-
-    # Pre-process the captions. Convert them to lowercase and and a full stop if it's missing.
-    image_captions["caption"] = preprocess_texts(
-        captions=image_captions["caption"].tolist()
+    training_set, validation_set, test_set = get_data(
+        output_path=output_path,
+        captions_path=captions_path,
+        images_path=images_path,
+        test_size=0.2,
     )
-    image_captions["lengths"] = [
-        len(caption.split()) for caption in image_captions["caption"].tolist()
-    ]
-    print(image_captions)
-
-    # For each image keep the smallest in length caption.
-    image_captions = image_captions.loc[
-        image_captions.groupby("image")["lengths"].idxmin()
-    ]
-    print(image_captions)
-
-    # Create the complete path of the images.
-    image_captions["image"] = [
-        os.path.join(images_paths, image) for image in image_captions["image"].tolist()
-    ]
-
-    # Split the data.
-    training_set, rest = train_test_split(
-        image_captions, test_size=0.125, random_state=1
-    )
-    validation_set, test_set = train_test_split(rest, test_size=0.5, random_state=1)
-    del rest, image_captions
 
     # Build the vocab which includes all tokens with at least min_freq occurrences in the texts.
     # Special tokens <PAD> and <UNK> are used for padding sequences and unknown words respectively.
@@ -168,26 +143,22 @@ if __name__ == "__main__":
     )
 
     # Init the models, optimizer and loss function
-    encoder = Encoder().to(device)
+    encoder = Encoder(embed_size=config["decoder_params"]["embed_size"]).to(device)
     decoder = Decoder(**config["decoder_params"]).to(device)
+    if pretrained:
+        embed_size = config["decoder_params"]["embed_size"]
+        embeddings = GloVe(name="6B", dim=embed_size)
+        vectors, not_found = get_pretrained_emb(
+            vocab=vocab, embeddings=embeddings, emb_size=embed_size
+        )
+        vectors = vectors.to(device)
+
+        # Add the pretrained embeddings.
+        decoder.EMBEDDING_LAYER = torch.nn.Embedding.from_pretrained(
+            vectors, freeze=config["freeze"], padding_idx=vocab["<PAD>"]
+        )
+
     model = ImageCaptioningModel(encoder=encoder, decoder=decoder).to(device)
-
-    # Only finetune the CNN
-    for name, param in model.named_parameters():
-        print(name, param.requires_grad)
-        if (
-            "encoder.inception.Conv2d" in name
-            or "encoder.inception.Mixed" in name
-            or "encoder.inception.AuxLogits" in name
-        ):
-            param.requires_grad = False
-            print(name, param.requires_grad)
-        # else:
-        #     param.requires_grad = train_CNN
-
-    # for name, param in model.named_parameters():
-    #     print(name, param.requires_grad)
-    # exit()
 
     loss_function = torch.nn.CrossEntropyLoss(ignore_index=vocab["<PAD>"])
     optimizer = torch.optim.Adam(
@@ -205,7 +176,16 @@ if __name__ == "__main__":
     max_val_score = np.NINF
     events = {}
     print("Training in:", device)
+
+    model = freeze_or_unfreeze_layers(model=model, layers=[], freeze=config["freeze"])
     for epoch in tqdm(range(config["epochs"]), desc="Epoch"):
+        if config["unfreeze_scheduler"] is not None:
+            model, new_events = unfreeze_model(
+                model=model,
+                epoch=epoch,
+                unfreeze_scheduler=config["unfreeze_scheduler"],
+            )
+            events = {**events, **new_events}
         model.train()
         for batch in tqdm(training_loader, desc="Training", leave=False):
             optimizer.zero_grad()
