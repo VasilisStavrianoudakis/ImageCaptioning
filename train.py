@@ -9,6 +9,7 @@ import torch
 from PIL import Image
 from sklearn.model_selection import train_test_split
 from torchmetrics.functional import bleu_score
+
 # from torchmetrics.functional.text.rouge import rouge_score
 from torchtext.vocab import GloVe, build_vocab_from_iterator
 from torchtext.vocab.vocab import Vocab
@@ -17,10 +18,18 @@ from tqdm import tqdm
 
 from models import Decoder, Encoder, ImageCaptioningModel
 from plotter import plot_info
-from utils import (CustomDataLoader, freeze_or_unfreeze_layers, get_data,
-                   get_pretrained_emb, open_json, preprocess_image,
-                   preprocess_texts, tokens_generator, unfreeze_model,
-                   write_json)
+from utils import (
+    CustomDataLoader,
+    freeze_or_unfreeze_layers,
+    get_data,
+    get_pretrained_emb,
+    open_json,
+    preprocess_image,
+    preprocess_texts,
+    tokens_generator,
+    unfreeze_model,
+    write_json,
+)
 
 
 def eval_model(
@@ -77,7 +86,7 @@ def eval_model(
             pred_sentences.extend([" ".join(sentence) for sentence in pred_sentences_])
             true_sentences.extend([" ".join(sentence) for sentence in true_sentences_])
 
-    score = bleu_score(pred_sentences, true_sentences).item()
+    score = bleu_score(pred_sentences, true_sentences, n_gram=2).item()
     return score, torch.tensor(val_losses).mean().item()
 
 
@@ -102,6 +111,11 @@ if __name__ == "__main__":
     )
     figs_path = os.path.join(model_path, "figs")
 
+    # df = pd.read_csv(captions_path)
+
+    # df["new_caption"] = preprocess_texts(captions=df["caption"].tolist())
+    # df.to_csv("seethis.csv", index=False)
+    # exit()
     training_set, validation_set, test_set = get_data(
         output_path=output_path,
         captions_path=captions_path,
@@ -177,7 +191,9 @@ if __name__ == "__main__":
     events = {}
     print("Training in:", device)
 
-    model = freeze_or_unfreeze_layers(model=model, layers=[], freeze=config["freeze"])
+    model = freeze_or_unfreeze_layers(
+        model=model, layers=["encoder", "decoder"], freeze=config["freeze"]
+    )
     for epoch in tqdm(range(config["epochs"]), desc="Epoch"):
         if config["unfreeze_scheduler"] is not None:
             model, new_events = unfreeze_model(

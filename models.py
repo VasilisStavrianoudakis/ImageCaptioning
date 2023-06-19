@@ -18,7 +18,7 @@ class Encoder(nn.Module):
         super().__init__()
         output_calc = lambda i, k, p, s: int(math.floor(((i + 2 * p - k) / s) + 1))
         out_channels = 16
-        m = 1
+        m = 2
         k = 7
         s = 1
         p = 1
@@ -36,7 +36,6 @@ class Encoder(nn.Module):
         self.max_pool1 = nn.MaxPool2d(kernel_size=k, stride=s, padding=p)
         out_dim = output_calc(i=out_dim, k=k, p=p, s=s)
 
-        m *= 2
         in_channels = out_channels
         out_channels = m * out_channels
         k = 5
@@ -56,7 +55,6 @@ class Encoder(nn.Module):
         self.max_pool2 = nn.MaxPool2d(kernel_size=k, stride=s, padding=p)
         out_dim = output_calc(i=out_dim, k=k, p=p, s=s)
 
-        m *= 2
         in_channels = out_channels
         out_channels = m * out_channels
         k = 3
@@ -78,7 +76,8 @@ class Encoder(nn.Module):
 
         self.embed_size = embed_size
         if embed_size > 0:
-            fc_in = out_channels * out_dim
+            # Each matrix in each channel is out_dim x out_dim and we have out_channels number of channels.
+            fc_in = out_channels * out_dim * out_dim
             self.FC = nn.Linear(fc_in, embed_size)
 
         # self.inception = models.inception_v3(pretrained=True, aux_logits=True)

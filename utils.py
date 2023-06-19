@@ -1,10 +1,12 @@
 import json
 import os
+import re
 from math import ceil
 from typing import Any, Dict, List, Tuple, Union
 
 import pandas as pd
 import torch
+from num2words import num2words
 from PIL import Image
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
@@ -54,11 +56,37 @@ def tokens_generator(texts: List[str]):
         yield text.split()
 
 
+def remove_redundant_spaces(text: str) -> str:
+    text = re.sub(r"\s+", " ", text)
+    text = text.strip()
+    return text
+
+
 def preprocess_texts(captions: List[str]) -> List[str]:
     captions = [caption.lower() for caption in captions]
     captions = [
+        caption.replace("#", "number").replace("&", "and") for caption in captions
+    ]
+    # Remove everything that it's in parentheses.
+    captions = [re.sub(r"\(.+\)", "", caption) for caption in captions]
+    captions = [re.sub(r"[\.\;\!:\(\)]", "", caption) for caption in captions]
+    captions = [remove_redundant_spaces(caption) for caption in captions]
+
+    # Numbers to words.
+    captions = [
+        " ".join(
+            [
+                num2words(token) if token.isdigit() else token
+                for token in caption.split()
+            ]
+        )
+        for caption in captions
+    ]
+
+    captions = [
         caption if caption[-1] == "." else caption + " ." for caption in captions
     ]
+
     return captions
 
 
@@ -90,12 +118,6 @@ def get_data(
         image_captions["caption"] = preprocess_texts(
             captions=image_captions["caption"].tolist()
         )
-
-        # Create the complete path of the images.
-        image_captions["image"] = [
-            os.path.join(images_path, image)
-            for image in image_captions["image"].tolist()
-        ]
 
         # Split the data.
         _, rest = train_test_split(
@@ -140,6 +162,17 @@ def get_data(
         training_set = pd.read_csv(os.path.join(output_path, "train.csv"))
         validation_set = pd.read_csv(os.path.join(output_path, "validation.csv"))
         test_set = pd.read_csv(os.path.join(output_path, "test.csv"))
+
+    # Create the complete path of the images.
+    training_set["image"] = [
+        os.path.join(images_path, image) for image in training_set["image"].tolist()
+    ]
+    validation_set["image"] = [
+        os.path.join(images_path, image) for image in validation_set["image"].tolist()
+    ]
+    test_set["image"] = [
+        os.path.join(images_path, image) for image in test_set["image"].tolist()
+    ]
 
     return training_set, validation_set, test_set
 
