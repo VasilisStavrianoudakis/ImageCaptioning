@@ -128,8 +128,18 @@ class Decoder(nn.Module):
             batch_first=True,
             bidirectional=False,
         )
-        self.FC = nn.Linear(hidden_size, vocab_size)
-        self.dropout = nn.Dropout(p=dropout_prob)
+        self.FC = nn.Sequential(
+            nn.Linear(hidden_size, hidden_size),
+            nn.ReLU(),
+            nn.Dropout(p=dropout_prob),
+            nn.Linear(hidden_size, int(hidden_size * 0.5)),
+            nn.ReLU(),
+            nn.Dropout(p=dropout_prob),
+            nn.Linear(int(hidden_size * 0.5), vocab_size),
+        )
+
+        # self.FC = nn.Linear(hidden_size, vocab_size)
+        # self.dropout = nn.Dropout(p=dropout_prob)
 
     def forward(
         self, features: torch.Tensor, captions: torch.LongTensor, lengths: List[int]

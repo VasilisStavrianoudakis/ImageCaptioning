@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 import torch
 from PIL import Image
-from sklearn.model_selection import train_test_split
 from torchmetrics.functional import bleu_score
 
 # from torchmetrics.functional.text.rouge import rouge_score
@@ -21,7 +20,7 @@ from plotter import plot_info
 from utils import (
     CustomDataLoader,
     freeze_or_unfreeze_layers,
-    get_data,
+    get_and_create_data,
     get_pretrained_emb,
     open_json,
     preprocess_image,
@@ -30,6 +29,17 @@ from utils import (
     unfreeze_model,
     write_json,
 )
+
+
+def get_image_caption(
+    model: ImageCaptioningModel, image_path: str, vocab: Vocab, max_length: int = 25
+) -> str:
+    img = Image.open(image_path).convert("RGB")
+    img = preprocess_image(img).to(device)
+
+    model.eval()
+    caption = model.caption_image(image=img, vocab=vocab, max_length=max_length)
+    return caption
 
 
 def eval_model(
@@ -95,6 +105,7 @@ if __name__ == "__main__":
     script_path = Path(__file__).resolve().parent
     data_path = os.path.join(script_path, "data")
     output_path = os.path.join(data_path, "csv")
+    training_images_output_path = os.path.join(data_path, "training_images")
     images_path = os.path.join(data_path, "Images")
     captions_path = os.path.join(data_path, "captions.txt")
 
@@ -110,24 +121,45 @@ if __name__ == "__main__":
         f"{str(datetime.now().isoformat())}_{suffix}",
     )
     figs_path = os.path.join(model_path, "figs")
+    txt_path = os.path.join(model_path, "validation_image_caption.txt")
 
     # df = pd.read_csv(captions_path)
 
     # df["new_caption"] = preprocess_texts(captions=df["caption"].tolist())
     # df.to_csv("seethis.csv", index=False)
     # exit()
-    training_set, validation_set, test_set = get_data(
+    training_set, validation_set, test_set = get_and_create_data(
         output_path=output_path,
+        training_images_output_path=training_images_output_path,
         captions_path=captions_path,
         images_path=images_path,
         test_size=0.2,
     )
+    # exit()
 
     # Build the vocab which includes all tokens with at least min_freq occurrences in the texts.
     # Special tokens <PAD> and <UNK> are used for padding sequences and unknown words respectively.
+
+    # from collections import Counter
+
+    # c = Counter()
+    # for tokens in tokens_generator(texts=training_set["caption"].tolist()):
+    #     c.update(tokens)
+    # print(c)
+    # print(c.most_common(10))
+
+    # df = pd.DataFrame(data={"token": list(c.keys()), "count": list(c.values())})
+    # print(df)
+
+    # print(df[df["count"] <= 10])
+    # df = pd.read_csv(captions_path)
+    # df["new_caption"] = preprocess_texts(captions=df["caption"].tolist())
+    # df.to_csv("seethis.csv", index=False)
+    # exit()
+
     vocab = build_vocab_from_iterator(
         tokens_generator(texts=training_set["caption"].tolist()),
-        min_freq=5,
+        min_freq=config["vocab_min_freq"],
         specials=["<PAD>", "<UNK>"],
         special_first=True,
     )
@@ -140,6 +172,7 @@ if __name__ == "__main__":
         vocab=vocab,
         do_shuffle=True,
         batch_size=config["batch_size"],
+        inference=True,
     )
     validation_loader = CustomDataLoader(
         images_paths=validation_set["image"].tolist(),
@@ -147,6 +180,7 @@ if __name__ == "__main__":
         vocab=vocab,
         do_shuffle=False,
         batch_size=config["batch_size"],
+        inference=True,
     )
     test_loader = CustomDataLoader(
         images_paths=test_set["image"].tolist(),
@@ -154,6 +188,7 @@ if __name__ == "__main__":
         vocab=vocab,
         do_shuffle=False,
         batch_size=config["batch_size"],
+        inference=True,
     )
 
     # Init the models, optimizer and loss function
@@ -178,6 +213,10 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(
         model.parameters(), lr=config["lr"], weight_decay=config["weight_decay"]
     )
+    model = freeze_or_unfreeze_layers(
+        model=model, layers=["encoder", "decoder"], freeze=config["freeze"]
+    )
+    print(model)
 
     stats_per_epoch = {}
     stats_per_epoch["training_loss"] = []
@@ -189,11 +228,21 @@ if __name__ == "__main__":
     min_val_loss = np.inf
     max_val_score = np.NINF
     events = {}
-    print("Training in:", device)
 
-    model = freeze_or_unfreeze_layers(
-        model=model, layers=["encoder", "decoder"], freeze=config["freeze"]
+    random_val_image = validation_set.sample(1)
+    write = []
+    write.append(f"Image name: {random_val_image.iloc[0]['image']}\n")
+    write.append(f"True caption: {random_val_image.iloc[0]['caption']}\n\n")
+    random_val_image_caption = get_image_caption(
+        model=model,
+        image_path=random_val_image.iloc[0]["image"],
+        vocab=vocab,
+        max_length=25,
     )
+    print("Random val image:", random_val_image.iloc[0]["image"])
+    write.append(f"Caption before training: {random_val_image_caption}\n\n")
+
+    print("Training in:", device)
     for epoch in tqdm(range(config["epochs"]), desc="Epoch"):
         if config["unfreeze_scheduler"] is not None:
             model, new_events = unfreeze_model(
@@ -243,12 +292,22 @@ if __name__ == "__main__":
         print(
             f"Epoch {epoch}, mean training loss {training_loss:.2f}, mean val loss {validation_loss:.2f}, training bleu: {round(training_score, 3)}, validation blue: {round(validation_score, 3)}"
         )
-        if validation_score > max_val_score:
+
+        random_val_image_caption = get_image_caption(
+            model=model,
+            image_path=random_val_image.iloc[0]["image"],
+            vocab=vocab,
+            max_length=25,
+        )
+        write.append(f"Epoch: {str(epoch + 1)} caption: {random_val_image_caption}\n")
+        print("Caption:", random_val_image_caption)
+        if validation_loss < min_val_loss:
+            num_epochs_without_improvement = 0
             events["best_model"] = epoch
             print(
-                f" *** Saving best model. Best validation bleu: {max_val_score} -> {validation_score}"
+                f" *** Saving best model. Best validation loss: {min_val_loss} -> {validation_loss}"
             )
-            max_val_score = validation_score
+            min_val_loss = validation_loss
             os.makedirs(model_path, exist_ok=True)
             # Save the training config.
             write_json(
@@ -281,13 +340,21 @@ if __name__ == "__main__":
             )
             break
 
+    torch.save(
+        {
+            "epoch": config["epochs"],
+            "model_state_dict": model.state_dict(),
+        },
+        os.path.join(model_path, f"epochs_{str(config['epochs'])}.pt"),
+    )
+
     os.makedirs(figs_path, exist_ok=True)
     # PLOT TRAINING INFO
     plot_info(
         extra_epochs=-1,
         training_val=stats_per_epoch["training_score"],
         validation_val=stats_per_epoch["validation_score"],
-        y_name="BLEU",
+        y_name="BLEU SCORE",
         saveto=os.path.join(figs_path, "model_bleu.png"),
         events=events,
     )
@@ -320,17 +387,19 @@ if __name__ == "__main__":
         device=device,
     )
 
-    print(f"Test loss: {round(test_loss, 3)}, Test bleu: {round(test_score, 3)}")
+    test_results = (
+        f"\n\nTest loss: {round(test_loss, 3)}, Test bleu: {round(test_score, 3)}"
+    )
+    print(test_results)
+    write.append(test_results)
+    with open(txt_path, "w", encoding="utf8") as fp:
+        fp.writelines(write)
 
-    img = Image.open(training_set.iloc[0]["image"]).convert("RGB")
-    img = preprocess_image(img).to(device)
-    print(img.shape)
-
-    model.eval()
-    c = model.caption_image(image=img, vocab=vocab, max_length=15)
-    print("EDWWWWWWWWWWWWWWWWW")
-    print(c)
-
-    # img = img.squeeze(0)
-    # img = transforms.ToPILImage()(img)
-    # img.show()
+    random_training_image_caption = get_image_caption(
+        model=model,
+        image_path=training_set.iloc[0]["image"],
+        vocab=vocab,
+        max_length=25,
+    )
+    print("Random training image:", training_set.iloc[0]["image"])
+    print("Caption:", random_training_image_caption)

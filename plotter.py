@@ -82,7 +82,7 @@ def plot_info(
     plt.xticks(ticks)
     plt.xticks(ticks, rotation=45, ha="right")
 
-    plt.title(y_name)
+    plt.title(f"Training - Validation {y_name}")
     plt.ylabel(y_name)
     plt.xlabel("epoch")
     plt.grid(True)
