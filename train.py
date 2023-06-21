@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import torch
 from PIL import Image
+from torchinfo import summary
 from torchmetrics.functional import bleu_score
 
 # from torchmetrics.functional.text.rouge import rouge_score
@@ -123,6 +124,7 @@ if __name__ == "__main__":
     )
     figs_path = os.path.join(model_path, "figs")
     txt_path = os.path.join(model_path, "validation_image_caption.txt")
+    model_structure_path = os.path.join(model_path, "model_structure.txt")
 
     # df = pd.read_csv(captions_path)
 
@@ -324,9 +326,11 @@ if __name__ == "__main__":
             min_val_loss = validation_loss
             os.makedirs(model_path, exist_ok=True)
             # Save the training config.
-            write_json(
-                filepath=os.path.join(model_path, "training_config.json"), data=config
-            )
+            if not os.path.exists(os.path.join(model_path, "training_config.json")):
+                write_json(
+                    filepath=os.path.join(model_path, "training_config.json"),
+                    data=config,
+                )
 
             # Save the model.
             torch.save(
@@ -343,7 +347,20 @@ if __name__ == "__main__":
             )
 
             # Save the vocab object.
-            torch.save(vocab, os.path.join(model_path, vocab_name))
+            if not os.path.exists(os.path.join(model_path, vocab_name)):
+                torch.save(vocab, os.path.join(model_path, vocab_name))
+
+            # Save model's structure.
+            if not os.path.exists(model_structure_path):
+                model_stats = summary(
+                    model=model,
+                    input_data=[images, model_captions, lengths],
+                    batch_dim=config["batch_size"],
+                    verbose=0,
+                )
+                summary_str = str(model_stats)
+                with open(model_structure_path, "w", encoding="utf8") as fp:
+                    fp.write(summary_str)
 
         else:
             num_epochs_without_improvement += 1

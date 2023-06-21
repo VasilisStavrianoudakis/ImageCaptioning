@@ -78,8 +78,8 @@ class Encoder(nn.Module):
         if lstm_hidden_size > 0:
             # Each matrix in each channel is out_dim x out_dim and we have out_channels number of channels.
             fc_in = out_channels * out_dim * out_dim
-            self.h = nn.Linear(fc_in, lstm_hidden_size)
-            self.c = nn.Linear(fc_in, lstm_hidden_size)
+            self.H_0 = nn.Linear(fc_in, lstm_hidden_size)
+            self.C_0 = nn.Linear(fc_in, lstm_hidden_size)
 
         # self.inception = models.inception_v3(pretrained=True, aux_logits=True)
         # self.inception.fc = nn.Linear(self.inception.fc.in_features, 1600)
@@ -96,9 +96,9 @@ class Encoder(nn.Module):
         x = self.max_pool3(x)
         x = torch.flatten(x, start_dim=1)
         if self.lstm_hidden_size > 0:
-            h_ = self.dropout(self.activation_function(self.h(x)))
-            c_ = self.dropout(self.activation_function(self.c(x)))
-            return h_, c_
+            h_0 = self.dropout(self.activation_function(self.H_0(x)))
+            c_0 = self.dropout(self.activation_function(self.C_0(x)))
+            return h_0, c_0
 
         # x = self.inception(images)
         # try:
