@@ -48,6 +48,7 @@ def eval_model(
     vocab: Vocab,
     optimizer,
     loss_function,
+    bleu_n_gram: int,
     device: torch.device,
 ) -> Tuple[float, float]:
     itos = vocab.get_itos()
@@ -96,7 +97,7 @@ def eval_model(
             pred_sentences.extend([" ".join(sentence) for sentence in pred_sentences_])
             true_sentences.extend([" ".join(sentence) for sentence in true_sentences_])
 
-    score = bleu_score(pred_sentences, true_sentences, n_gram=2).item()
+    score = bleu_score(pred_sentences, true_sentences, n_gram=bleu_n_gram).item()
     return score, torch.tensor(val_losses).mean().item()
 
 
@@ -156,11 +157,11 @@ if __name__ == "__main__":
     # df["new_caption"] = preprocess_texts(captions=df["caption"].tolist())
     # df.to_csv("seethis.csv", index=False)
     # exit()
-
+    start_token = config["start_token"]
     vocab = build_vocab_from_iterator(
         tokens_generator(texts=training_set["caption"].tolist()),
         min_freq=config["vocab_min_freq"],
-        specials=["<PAD>", "<UNK>"],
+        specials=["<PAD>", "<UNK>", start_token],
         special_first=True,
     )
     vocab.set_default_index(vocab["<UNK>"])
@@ -173,6 +174,7 @@ if __name__ == "__main__":
         do_shuffle=True,
         batch_size=config["batch_size"],
         inference=True,
+        start_token=start_token,
     )
     validation_loader = CustomDataLoader(
         images_paths=validation_set["image"].tolist(),
@@ -181,6 +183,7 @@ if __name__ == "__main__":
         do_shuffle=False,
         batch_size=config["batch_size"],
         inference=True,
+        start_token=start_token,
     )
     test_loader = CustomDataLoader(
         images_paths=test_set["image"].tolist(),
@@ -189,10 +192,14 @@ if __name__ == "__main__":
         do_shuffle=False,
         batch_size=config["batch_size"],
         inference=True,
+        start_token=start_token,
     )
 
     # Init the models, optimizer and loss function
-    encoder = Encoder(embed_size=config["decoder_params"]["embed_size"]).to(device)
+    encoder = Encoder(
+        lstm_hidden_size=config["decoder_params"]["lstm_hidden_size"],
+        **config["encoder_params"],
+    ).to(device)
     decoder = Decoder(**config["decoder_params"]).to(device)
     if pretrained:
         embed_size = config["decoder_params"]["embed_size"]
@@ -207,10 +214,12 @@ if __name__ == "__main__":
             vectors, freeze=config["freeze"], padding_idx=vocab["<PAD>"]
         )
 
-    model = ImageCaptioningModel(encoder=encoder, decoder=decoder).to(device)
+    model = ImageCaptioningModel(
+        encoder=encoder, decoder=decoder, start_token=start_token, device=device
+    ).to(device)
 
     loss_function = torch.nn.CrossEntropyLoss(ignore_index=vocab["<PAD>"])
-    optimizer = torch.optim.Adam(
+    optimizer = torch.optim.AdamW(
         model.parameters(), lr=config["lr"], weight_decay=config["weight_decay"]
     )
     model = freeze_or_unfreeze_layers(
@@ -241,8 +250,11 @@ if __name__ == "__main__":
     )
     print("Random val image:", random_val_image.iloc[0]["image"])
     write.append(f"Caption before training: {random_val_image_caption}\n\n")
+    # print(random_val_image_caption)
+    # exit()
 
     print("Training in:", device)
+    # print(vocab.get_stoi())
     for epoch in tqdm(range(config["epochs"]), desc="Epoch"):
         if config["unfreeze_scheduler"] is not None:
             model, new_events = unfreeze_model(
@@ -275,6 +287,7 @@ if __name__ == "__main__":
             optimizer=optimizer,
             loss_function=loss_function,
             device=device,
+            bleu_n_gram=config["bleu_n_gram"],
         )
 
         validation_score, validation_loss = eval_model(
@@ -284,6 +297,7 @@ if __name__ == "__main__":
             optimizer=optimizer,
             loss_function=loss_function,
             device=device,
+            bleu_n_gram=config["bleu_n_gram"],
         )
         stats_per_epoch["training_loss"].append(training_loss)
         stats_per_epoch["training_score"].append(training_score)
@@ -371,7 +385,9 @@ if __name__ == "__main__":
     del model
     checkpoint = torch.load(os.path.join(model_path, checkpoint_name))
 
-    model = ImageCaptioningModel(encoder=encoder, decoder=decoder)
+    model = ImageCaptioningModel(
+        encoder=encoder, decoder=decoder, start_token=start_token, device=device
+    )
     model.load_state_dict(checkpoint["model_state_dict"])
 
     # This is to make sure that the vocab object can be loaded successfully.
@@ -385,6 +401,7 @@ if __name__ == "__main__":
         optimizer=optimizer,
         loss_function=loss_function,
         device=device,
+        bleu_n_gram=config["bleu_n_gram"],
     )
 
     test_results = (

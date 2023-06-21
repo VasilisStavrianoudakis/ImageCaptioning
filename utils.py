@@ -393,6 +393,7 @@ class CustomDataLoader:
         images_paths: List[str],
         captions: List[str],
         vocab: Vocab,
+        start_token: str,
         do_shuffle: bool = False,
         batch_size: int = 16,
         inference: bool = True,
@@ -400,6 +401,9 @@ class CustomDataLoader:
         self.images_paths = images_paths
         # self.captions = captions
         self.vocab = vocab
+        # Add the start token.
+        captions = [start_token + " " + caption for caption in captions]
+        # print(captions[:2])
         self.captions = [
             [vocab[token] for token in caption.split()] for caption in captions
         ]
@@ -449,13 +453,15 @@ class CustomDataLoader:
         # print(imgs.shape)
 
         true_captions = [caption for caption in self.captions[self.current_index : end]]
-        lengths = [len(caption) for caption in true_captions]
+        lengths = [len(caption) - 1 for caption in true_captions]
         true_captions = [torch.LongTensor(caption) for caption in true_captions]
 
         # Remove the full stop because we want the model to stop generating after this.
         model_captions = [caption[:-1] for caption in true_captions]
         model_captions = pad_sequence(model_captions, batch_first=True)
 
+        # Remove the start_token because this isn't part of the original caption.
+        true_captions = [caption[1:] for caption in true_captions]
         true_captions = pad_sequence(true_captions, batch_first=True)
 
         self.current_index = end

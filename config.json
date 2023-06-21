@@ -1,17 +1,22 @@
 {
-    "epochs": 60,
-    "batch_size": 512,
+    "epochs": 25,
+    "batch_size": 256,
     "lr": 2e-4,
-    "weight_decay": 0,
+    "weight_decay": 2e-3,
     "patience": -1,
-    "pretrained": false,
+    "pretrained": true,
     "freeze": false,
     "decoder_params": {
         "embed_size": 300,
-        "hidden_size": 2048,
-        "num_layers": 2,
-        "dropout_prob": 0.1
+        "lstm_hidden_size": 4096,
+        "num_layers": 1,
+        "dropout_prob": 0.3
+    },
+    "encoder_params": {
+        "dropout_prob": 0.3
     },
     "unfreeze_scheduler": null,
-    "vocab_min_freq": 10
+    "vocab_min_freq": 10,
+    "start_token": "<START>",
+    "bleu_n_gram": 2
 }

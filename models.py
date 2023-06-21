@@ -12,7 +12,7 @@ class Encoder(nn.Module):
         self,
         img_size: int = 256,
         in_channels: int = 3,
-        embed_size: int = -1,
+        lstm_hidden_size: int = -1,
         dropout_prob: float = 0.5,
     ):
         super().__init__()
@@ -50,7 +50,7 @@ class Encoder(nn.Module):
         )
         out_dim = output_calc(i=out_dim, k=k, p=p, s=s)
         k = 5
-        s = 2
+        s = 3
         p = 1
         self.max_pool2 = nn.MaxPool2d(kernel_size=k, stride=s, padding=p)
         out_dim = output_calc(i=out_dim, k=k, p=p, s=s)
@@ -69,16 +69,17 @@ class Encoder(nn.Module):
         )
         out_dim = output_calc(i=out_dim, k=k, p=p, s=s)
         k = 5
-        s = 2
+        s = 3
         p = 1
         self.max_pool3 = nn.MaxPool2d(kernel_size=k, stride=s, padding=p)
         out_dim = output_calc(i=out_dim, k=k, p=p, s=s)
 
-        self.embed_size = embed_size
-        if embed_size > 0:
+        self.lstm_hidden_size = lstm_hidden_size
+        if lstm_hidden_size > 0:
             # Each matrix in each channel is out_dim x out_dim and we have out_channels number of channels.
             fc_in = out_channels * out_dim * out_dim
-            self.FC = nn.Linear(fc_in, embed_size)
+            self.h = nn.Linear(fc_in, lstm_hidden_size)
+            self.c = nn.Linear(fc_in, lstm_hidden_size)
 
         # self.inception = models.inception_v3(pretrained=True, aux_logits=True)
         # self.inception.fc = nn.Linear(self.inception.fc.in_features, 1600)
@@ -94,8 +95,10 @@ class Encoder(nn.Module):
         x = self.activation_function(self.CONV3(x))
         x = self.max_pool3(x)
         x = torch.flatten(x, start_dim=1)
-        if self.embed_size > 0:
-            x = self.activation_function(self.FC(x))
+        if self.lstm_hidden_size > 0:
+            h_ = self.dropout(self.activation_function(self.h(x)))
+            c_ = self.dropout(self.activation_function(self.c(x)))
+            return h_, c_
 
         # x = self.inception(images)
         # try:
@@ -112,7 +115,7 @@ class Decoder(nn.Module):
     def __init__(
         self,
         embed_size: int,
-        hidden_size: int,
+        lstm_hidden_size: int,
         vocab_size: int,
         num_layers: int,
         dropout_prob: float = 0.5,
@@ -123,19 +126,19 @@ class Decoder(nn.Module):
         )
         self.LSTM_LAYER = nn.LSTM(
             input_size=embed_size,
-            hidden_size=hidden_size,
+            hidden_size=lstm_hidden_size,
             num_layers=num_layers,
             batch_first=True,
             bidirectional=False,
         )
         self.FC = nn.Sequential(
-            nn.Linear(hidden_size, hidden_size),
+            # nn.Linear(lstm_hidden_size, lstm_hidden_size),
+            # nn.ReLU(),
+            # nn.Dropout(p=dropout_prob),
+            nn.Linear(lstm_hidden_size, int(lstm_hidden_size * 0.5)),
             nn.ReLU(),
             nn.Dropout(p=dropout_prob),
-            nn.Linear(hidden_size, int(hidden_size * 0.5)),
-            nn.ReLU(),
-            nn.Dropout(p=dropout_prob),
-            nn.Linear(int(hidden_size * 0.5), vocab_size),
+            nn.Linear(int(lstm_hidden_size * 0.5), vocab_size),
         )
 
         # self.FC = nn.Linear(hidden_size, vocab_size)
@@ -148,8 +151,8 @@ class Decoder(nn.Module):
         x = self.EMBEDDING_LAYER(captions)
         # Output: batch x seq_length x embedding_dimension
 
-        # Add the image context vector as the first element of the sequence.
-        x = torch.cat((features.unsqueeze(1), x), dim=1)
+        # # Add the image context vector as the first element of the sequence.
+        # x = torch.cat((features.unsqueeze(1), x), dim=1)
 
         lengths = torch.tensor(lengths, dtype=torch.int16).cpu()
 
@@ -160,7 +163,15 @@ class Decoder(nn.Module):
         # Output: batch_sum_seq_len x embedding_dimension
         # Say batch = 2, len(seq1) = 4 and len(seq2) = 3. So batch_sum_seq_len = 4 + 3 = 7
 
-        x, _ = self.LSTM_LAYER(x)
+        h, c = features
+        h = h.unsqueeze(0)
+        c = c.unsqueeze(0)
+        # print("=" * 100)
+        # print(features[0].shape)
+        # print(features[1].shape)
+        # print("=" * 100)
+
+        x, _ = self.LSTM_LAYER(x, (h, c))
 
         # Unpack the output.
         x, _ = nn.utils.rnn.pad_packed_sequence(x, batch_first=True)
@@ -171,13 +182,13 @@ class Decoder(nn.Module):
 
 class ImageCaptioningModel(nn.Module):
     def __init__(
-        self,
-        encoder: Encoder,
-        decoder: Decoder,
+        self, encoder: Encoder, decoder: Decoder, start_token: str, device: torch.device
     ):
         super().__init__()
         self.encoder = encoder
         self.decoder = decoder
+        self.start_token = start_token
+        self.device = device
 
     def forward(self, images, captions, lengths: list) -> torch.Tensor:
         features = self.encoder(images)
@@ -189,9 +200,22 @@ class ImageCaptioningModel(nn.Module):
         result_caption = []
 
         with torch.no_grad():
-            x = self.encoder(image).unsqueeze(0)
+            # x = self.encoder(image).unsqueeze(0)
+            # # print(x.shape)
+            # states = None
+            x = vocab[self.start_token]
+            x = torch.tensor(x).to(self.device)
+            x = self.decoder.EMBEDDING_LAYER(x).unsqueeze(0).unsqueeze(0)
             # print(x.shape)
-            states = None
+            h, c = self.encoder(image)
+
+            h = h.unsqueeze(0)
+            c = c.unsqueeze(0)
+
+            states = (h, c)
+            # print(states[0].shape)
+            # print(states[1].shape)
+            # print("=" * 100)
 
             for _ in range(max_length):
                 hiddens, states = self.decoder.LSTM_LAYER(x, states)
