@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Iterator, Tuple
 
 import numpy as np
-import pandas as pd
 import torch
 from PIL import Image
 from torchinfo import summary
@@ -13,7 +12,6 @@ from torchmetrics.functional import bleu_score
 # from torchmetrics.functional.text.rouge import rouge_score
 from torchtext.vocab import GloVe, build_vocab_from_iterator
 from torchtext.vocab.vocab import Vocab
-from torchvision import transforms
 from tqdm import tqdm
 
 from models import Decoder, Encoder, ImageCaptioningModel
@@ -25,7 +23,6 @@ from utils import (
     get_pretrained_emb,
     open_json,
     preprocess_image,
-    preprocess_texts,
     tokens_generator,
     unfreeze_model,
     write_json,
@@ -71,10 +68,8 @@ def eval_model(
                 outputs.reshape(-1, outputs.shape[2]), true_captions.reshape(-1)
             )
 
-            # loss.backward()
             val_losses.append(loss.item())
 
-            # print(outputs.shape)
             model_output = torch.argmax(outputs, dim=2).tolist()
             true_captions = true_captions.tolist()
 
@@ -106,8 +101,10 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     script_path = Path(__file__).resolve().parent
     data_path = os.path.join(script_path, "data")
-    output_path = os.path.join(data_path, "csv")
-    training_images_output_path = os.path.join(data_path, "training_images")
+    output_path = os.path.join(data_path, "unique_images_csv")
+    preprocessed_images_output_path = os.path.join(
+        data_path, "unique_preprocessed_images"
+    )
     images_path = os.path.join(data_path, "Images")
     captions_path = os.path.join(data_path, "captions.txt")
 
@@ -120,20 +117,22 @@ if __name__ == "__main__":
     vocab_name = "vocab.pt"
     model_path = os.path.join(
         inference_path,
-        f"{str(datetime.now().isoformat())}_{suffix}",
+        f"unique_images_context_as_gate_{str(datetime.now().isoformat())}_{suffix}",
     )
     figs_path = os.path.join(model_path, "figs")
     txt_path = os.path.join(model_path, "validation_image_caption.txt")
     model_structure_path = os.path.join(model_path, "model_structure.txt")
+    write = []
 
     # df = pd.read_csv(captions_path)
 
     # df["new_caption"] = preprocess_texts(captions=df["caption"].tolist())
     # df.to_csv("seethis.csv", index=False)
     # exit()
+
     training_set, validation_set, test_set = get_and_create_data(
         output_path=output_path,
-        training_images_output_path=training_images_output_path,
+        preprocessed_images_output_path=preprocessed_images_output_path,
         captions_path=captions_path,
         images_path=images_path,
         test_size=0.2,
@@ -175,7 +174,6 @@ if __name__ == "__main__":
         vocab=vocab,
         do_shuffle=True,
         batch_size=config["batch_size"],
-        inference=True,
         start_token=start_token,
     )
     validation_loader = CustomDataLoader(
@@ -184,7 +182,6 @@ if __name__ == "__main__":
         vocab=vocab,
         do_shuffle=False,
         batch_size=config["batch_size"],
-        inference=True,
         start_token=start_token,
     )
     test_loader = CustomDataLoader(
@@ -193,7 +190,6 @@ if __name__ == "__main__":
         vocab=vocab,
         do_shuffle=False,
         batch_size=config["batch_size"],
-        inference=True,
         start_token=start_token,
     )
 
@@ -205,11 +201,16 @@ if __name__ == "__main__":
     decoder = Decoder(**config["decoder_params"]).to(device)
     if pretrained:
         embed_size = config["decoder_params"]["embed_size"]
-        embeddings = GloVe(name="6B", dim=embed_size)
+        embeddings = GloVe(name="42B", dim=embed_size)
         vectors, not_found = get_pretrained_emb(
             vocab=vocab, embeddings=embeddings, emb_size=embed_size
         )
         vectors = vectors.to(device)
+
+        replaced = len(vocab) - len(not_found)
+        pretrained_embs_stats = f"{replaced} words were prefilled out of {len(vocab)} ({round(replaced/len(vocab), 4)})\n\n"
+        write.append(pretrained_embs_stats)
+        config["pretrained_embs_not_found_tokens"] = not_found
 
         # Add the pretrained embeddings.
         decoder.EMBEDDING_LAYER = torch.nn.Embedding.from_pretrained(
@@ -240,17 +241,19 @@ if __name__ == "__main__":
     max_val_score = np.NINF
     events = {}
 
-    random_val_image = validation_set.sample(1)
-    write = []
-    write.append(f"Image name: {random_val_image.iloc[0]['image']}\n")
-    write.append(f"True caption: {random_val_image.iloc[0]['caption']}\n\n")
+    # random_val_image = validation_set.sample(1)
+    random_val_image_path = validation_set.iloc[0]["image"]
+    random_val_image_true_caption = validation_set.iloc[0]["caption"]
+
+    write.append(f"Image name: {random_val_image_path}\n")
+    write.append(f"True caption: {random_val_image_true_caption}\n\n")
     random_val_image_caption = get_image_caption(
         model=model,
-        image_path=random_val_image.iloc[0]["image"],
+        image_path=random_val_image_path,
         vocab=vocab,
         max_length=25,
     )
-    print("Random val image:", random_val_image.iloc[0]["image"])
+    print("Random val image:", random_val_image_path)
     write.append(f"Caption before training: {random_val_image_caption}\n\n")
     # print(random_val_image_caption)
     # exit()
@@ -311,7 +314,7 @@ if __name__ == "__main__":
 
         random_val_image_caption = get_image_caption(
             model=model,
-            image_path=random_val_image.iloc[0]["image"],
+            image_path=random_val_image_path,
             vocab=vocab,
             max_length=25,
         )

@@ -98,29 +98,20 @@ def preprocess_texts(captions: List[str]) -> List[str]:
     return captions
 
 
-def get_transformations(inference: bool, will_be_saved: bool) -> List[Any]:
+def get_transformations(will_be_saved: bool) -> List[Any]:
     transformations = [
         transforms.Resize((256, 256)),
         transforms.ToTensor(),
     ]
-
-    if not inference:
-        transformations.append(transforms.RandomHorizontalFlip(p=0.5))
-        transformations.append(
-            transforms.RandomPerspective(distortion_scale=0.1, p=0.5)
-        )
-        transforms.RandomRotation(degrees=2)
     if will_be_saved:
         transformations.append(transforms.ToPILImage())
     return transformations
 
 
 def preprocess_image(
-    image: Image.Image, inference: bool = True, will_be_saved: bool = False
+    image: Image.Image, will_be_saved: bool = False
 ) -> Union[torch.Tensor, Image.Image]:
-    transformations = get_transformations(
-        inference=inference, will_be_saved=will_be_saved
-    )
+    transformations = get_transformations(will_be_saved=will_be_saved)
 
     transform = transforms.Compose(transformations)
     image = transform(image)
@@ -152,7 +143,7 @@ def _use_threads(
     init_size = q.qsize()
     with lock:
         bar = tqdm(
-            desc="Creating with threads",
+            desc="Preprocessing and saving images",
             total=init_size,
             leave=False,
         )
@@ -166,10 +157,7 @@ def _use_threads(
                 Image.open(os.path.join(images_path, img_name)).convert("RGB")
                 for img_name in images_name
             ]
-            imgs = [
-                preprocess_image(img, inference=False, will_be_saved=True)
-                for img in imgs
-            ]
+            imgs = [preprocess_image(img, will_be_saved=True) for img in imgs]
             new_images_name = [
                 img_name.replace(".jpg", f"_{i}.jpg")
                 for i, img_name in enumerate(images_name)
@@ -235,16 +223,16 @@ def _create_with_threads(
 def create_data(
     images_path: str,
     new_output_path: str,
-    training_set: pd.DataFrame,
+    df_set: pd.DataFrame,
 ) -> pd.DataFrame:
     os.makedirs(new_output_path, exist_ok=True)
-    training_set_ = [x for _, x in training_set.groupby("image")]
-    del training_set
+    df_set_ = [x for _, x in df_set.groupby("image")]
+    del df_set
     m = multiprocessing.Manager()
     q = m.Queue()
     n_jobs = _get_num_parallel_jobs(n_jobs=-1)
 
-    for df in tqdm(training_set_, desc="Creating batches"):
+    for df in df_set_:
         q.put_nowait(df)
 
     new_training_set = _create_with_threads(
@@ -258,13 +246,13 @@ def get_and_create_data(
     output_path: str,
     captions_path: str,
     images_path: str,
-    training_images_output_path: Optional[str] = None,
+    preprocessed_images_output_path: Optional[str] = None,
     test_size: float = 0.1,
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     if not os.path.exists(output_path):
         image_captions = pd.read_csv(captions_path)
 
-        # Pre-process the captions. Convert them to lowercase and and a full stop if it's missing.
+        # Pre-process the captions.
         image_captions["caption"] = preprocess_texts(
             captions=image_captions["caption"].tolist()
         )
@@ -273,45 +261,33 @@ def get_and_create_data(
             len(caption.split()) for caption in image_captions["caption"].tolist()
         ]
 
+        # For each image keep the smallest, in length, caption.
+        image_captions = image_captions.loc[
+            image_captions.groupby("image")["lengths"].idxmin()
+        ]
+
         # Split the data.
-        _, rest = train_test_split(
-            image_captions["image"].unique(), test_size=test_size, random_state=1
+        training_set, rest = train_test_split(
+            image_captions, test_size=test_size, random_state=1
         )
         validation_set, test_set = train_test_split(rest, test_size=0.5, random_state=1)
+        del rest
 
-        # Choose the smallest in length caption.
-        validation_set = image_captions.loc[
-            image_captions[image_captions["image"].isin(validation_set)]
-            .groupby("image")["lengths"]
-            .idxmin()
-        ]
-
-        # Remove the validation image-caption pairs from the training set.
-        training_set = (
-            pd.merge(image_captions, validation_set, indicator=True, how="outer")
-            .query('_merge=="left_only"')
-            .drop("_merge", axis=1)
-        )
-
-        # Choose the smallest in length caption.
-        test_set = image_captions.loc[
-            image_captions[image_captions["image"].isin(test_set)]
-            .groupby("image")["lengths"]
-            .idxmin()
-        ]
-
-        # Remove the test image-caption pairs from the training set.
-        training_set = (
-            pd.merge(training_set, test_set, indicator=True, how="outer")
-            .query('_merge=="left_only"')
-            .drop("_merge", axis=1)
-        )
-
-        if training_images_output_path is not None:
+        if preprocessed_images_output_path is not None:
             training_set = create_data(
                 images_path=images_path,
-                new_output_path=training_images_output_path,
-                training_set=training_set,
+                new_output_path=preprocessed_images_output_path,
+                df_set=training_set,
+            )
+            validation_set = create_data(
+                images_path=images_path,
+                new_output_path=preprocessed_images_output_path,
+                df_set=validation_set,
+            )
+            test_set = create_data(
+                images_path=images_path,
+                new_output_path=preprocessed_images_output_path,
+                df_set=test_set,
             )
 
         os.makedirs(output_path)
@@ -323,19 +299,21 @@ def get_and_create_data(
         validation_set = pd.read_csv(os.path.join(output_path, "validation.csv"))
         test_set = pd.read_csv(os.path.join(output_path, "test.csv"))
 
-    if training_images_output_path is None:
-        training_images_output_path = images_path
+    if preprocessed_images_output_path is None:
+        preprocessed_images_output_path = images_path
 
     # Create the complete path of the images.
     training_set["image"] = [
-        os.path.join(training_images_output_path, image)
+        os.path.join(preprocessed_images_output_path, image)
         for image in training_set["image"].tolist()
     ]
     validation_set["image"] = [
-        os.path.join(images_path, image) for image in validation_set["image"].tolist()
+        os.path.join(preprocessed_images_output_path, image)
+        for image in validation_set["image"].tolist()
     ]
     test_set["image"] = [
-        os.path.join(images_path, image) for image in test_set["image"].tolist()
+        os.path.join(preprocessed_images_output_path, image)
+        for image in test_set["image"].tolist()
     ]
 
     return training_set, validation_set, test_set
@@ -396,7 +374,6 @@ class CustomDataLoader:
         start_token: str,
         do_shuffle: bool = False,
         batch_size: int = 16,
-        inference: bool = True,
     ) -> None:
         self.images_paths = images_paths
         # self.captions = captions
@@ -408,7 +385,6 @@ class CustomDataLoader:
             [vocab[token] for token in caption.split()] for caption in captions
         ]
 
-        self.inference = inference
         self.do_shuffle = do_shuffle
         self.batch_size = batch_size
         self.current_index = 0
@@ -447,7 +423,7 @@ class CustomDataLoader:
             Image.open(img).convert("RGB")
             for img in self.images_paths[self.current_index : end]
         ]
-        imgs = [preprocess_image(img, inference=self.inference) for img in imgs]
+        imgs = [preprocess_image(img) for img in imgs]
         # imgs = [img.unsqueeze(0) for img in imgs]
         imgs = torch.cat(imgs, dim=0)
         # print(imgs.shape)

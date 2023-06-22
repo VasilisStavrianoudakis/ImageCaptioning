@@ -1,19 +1,19 @@
 {
-    "epochs": 25,
+    "epochs": 50,
     "batch_size": 256,
-    "lr": 2e-4,
-    "weight_decay": 2e-3,
+    "lr": 1e-4,
+    "weight_decay": 2e-4,
     "patience": -1,
-    "pretrained": true,
+    "pretrained": false,
     "freeze": false,
     "decoder_params": {
         "embed_size": 300,
-        "lstm_hidden_size": 4096,
+        "lstm_hidden_size": 2048,
         "num_layers": 1,
-        "dropout_prob": 0.3
+        "dropout_prob": 0.1
     },
     "encoder_params": {
-        "dropout_prob": 0.3
+        "dropout_prob": 0.0
     },
     "unfreeze_scheduler": null,
     "vocab_min_freq": 10,

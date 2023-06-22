@@ -29,6 +29,7 @@ class Encoder(nn.Module):
             stride=s,
             padding=p,
         )
+        self.conv1_bn = nn.BatchNorm2d(out_channels)
         out_dim = output_calc(i=img_size, k=k, p=p, s=s)
         k = 5
         s = 2
@@ -48,6 +49,7 @@ class Encoder(nn.Module):
             stride=s,
             padding=p,
         )
+        self.conv2_bn = nn.BatchNorm2d(out_channels)
         out_dim = output_calc(i=out_dim, k=k, p=p, s=s)
         k = 5
         s = 3
@@ -67,6 +69,7 @@ class Encoder(nn.Module):
             stride=s,
             padding=p,
         )
+        self.conv3_bn = nn.BatchNorm2d(out_channels)
         out_dim = output_calc(i=out_dim, k=k, p=p, s=s)
         k = 5
         s = 3
@@ -88,11 +91,11 @@ class Encoder(nn.Module):
         self.dropout = nn.Dropout(p=dropout_prob)
 
     def forward(self, images):
-        x = self.activation_function(self.CONV1(images))
+        x = self.activation_function(self.conv1_bn(self.CONV1(images)))
         x = self.max_pool1(x)
-        x = self.activation_function(self.CONV2(x))
+        x = self.activation_function(self.conv2_bn(self.CONV2(x)))
         x = self.max_pool2(x)
-        x = self.activation_function(self.CONV3(x))
+        x = self.activation_function(self.conv3_bn(self.CONV3(x)))
         x = self.max_pool3(x)
         x = torch.flatten(x, start_dim=1)
         if self.lstm_hidden_size > 0:
@@ -132,17 +135,11 @@ class Decoder(nn.Module):
             bidirectional=False,
         )
         self.FC = nn.Sequential(
-            # nn.Linear(lstm_hidden_size, lstm_hidden_size),
-            # nn.ReLU(),
-            # nn.Dropout(p=dropout_prob),
             nn.Linear(lstm_hidden_size, int(lstm_hidden_size * 0.5)),
             nn.ReLU(),
             nn.Dropout(p=dropout_prob),
             nn.Linear(int(lstm_hidden_size * 0.5), vocab_size),
         )
-
-        # self.FC = nn.Linear(hidden_size, vocab_size)
-        # self.dropout = nn.Dropout(p=dropout_prob)
 
     def forward(
         self, features: torch.Tensor, captions: torch.LongTensor, lengths: List[int]
@@ -150,9 +147,6 @@ class Decoder(nn.Module):
         # Input: batch_size x seq_length
         x = self.EMBEDDING_LAYER(captions)
         # Output: batch x seq_length x embedding_dimension
-
-        # # Add the image context vector as the first element of the sequence.
-        # x = torch.cat((features.unsqueeze(1), x), dim=1)
 
         lengths = torch.tensor(lengths, dtype=torch.int16).cpu()
 
@@ -166,10 +160,8 @@ class Decoder(nn.Module):
         h, c = features
         h = h.unsqueeze(0)
         c = c.unsqueeze(0)
-        # print("=" * 100)
-        # print(features[0].shape)
-        # print(features[1].shape)
-        # print("=" * 100)
+        # h_0 and c_0 must have (Directions * num_layers x batch size x lstm hidden size)
+        # But they are coming from the encoder as (batch size x lstm hidden size)
 
         x, _ = self.LSTM_LAYER(x, (h, c))
 
@@ -200,27 +192,17 @@ class ImageCaptioningModel(nn.Module):
         result_caption = []
 
         with torch.no_grad():
-            # x = self.encoder(image).unsqueeze(0)
-            # # print(x.shape)
-            # states = None
             x = vocab[self.start_token]
             x = torch.tensor(x).to(self.device)
             x = self.decoder.EMBEDDING_LAYER(x).unsqueeze(0).unsqueeze(0)
-            # print(x.shape)
-            h, c = self.encoder(image)
 
+            h, c = self.encoder(image)
             h = h.unsqueeze(0)
             c = c.unsqueeze(0)
-
             states = (h, c)
-            # print(states[0].shape)
-            # print(states[1].shape)
-            # print("=" * 100)
 
             for _ in range(max_length):
                 hiddens, states = self.decoder.LSTM_LAYER(x, states)
-                # print(hiddens.shape)
-                # print(hiddens.squeeze(0).shape)
                 output = self.decoder.FC(hiddens.squeeze(0))
                 predicted = output.argmax(1)
                 result_caption.append(predicted.item())
@@ -228,10 +210,7 @@ class ImageCaptioningModel(nn.Module):
                 if itos[predicted.item()] == ".":
                     break
 
-                # print(predicted.shape)
                 x = self.decoder.EMBEDDING_LAYER(predicted).unsqueeze(0)
-                # print(x.shape)
-                # print()
 
         caption = [itos[idx] for idx in result_caption]
         if caption[-1] != ".":
