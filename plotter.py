@@ -1,9 +1,12 @@
 # import itertools
+import os
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+from PIL import Image
 
 # from sklearn.metrics import confusion_matrix
 
@@ -90,16 +93,18 @@ def plot_info(
     plt.savefig(saveto, bbox_inches="tight")
 
 
-def plot_hist(data: List[Tuple[str, List[int]]], saveto: str):
+def plot_multiple_hist(data: List[Tuple[str, List[int]]], saveto: str):
     plt.figure()
-    # x = np.array(data[0][1])
-    # q25 = np.quantile(x, 0.25)
-    # q75 = np.quantile(x, 0.75)
-    # bin_width = 2 * (q75 - q25) * len(x) ** (-1 / 3)
-    # bins = int(
-    #     round((x.max() - x.min()) / bin_width)
-    # )  # for some reason my numpy version messes up the round function and it returns a np.float.
-    bins = np.arange(max(data[0][1]) + 1) - 0.5
+    # Calculate the optinal bin size.
+    x = np.array(data[0][1])
+    q25 = np.quantile(x, 0.25)
+    q75 = np.quantile(x, 0.75)
+    bin_width = 2 * (q75 - q25) * len(x) ** (-1 / 3)
+    bins = int(
+        round((x.max() - x.min()) / bin_width)
+    )  # for some reason my numpy version messes up the round function and it returns a np.float.
+
+    # bins = np.arange(max(data[0][1]) + 1) - 0.5
     # bins = 3
 
     if len(data) < 4:
@@ -121,4 +126,107 @@ def plot_hist(data: List[Tuple[str, List[int]]], saveto: str):
     fig.suptitle("Y Distribution")
     # fig.ylabel("Counts")
     # fig.xlabel("Bins")
+    plt.savefig(saveto, bbox_inches="tight")
+
+
+def plot_hist(
+    data: List[int],
+    title: str,
+    xlabel: str,
+    saveto: str,
+    xticks: Optional[List[Any]] = None,
+):
+    plt.figure()
+    # Calculate the optinal bin size.
+    x = np.array(data)
+    q25 = np.quantile(x, 0.25)
+    q75 = np.quantile(x, 0.75)
+    bin_width = 2 * (q75 - q25) * len(x) ** (-1 / 3)
+    bins = int(
+        round((x.max() - x.min()) / bin_width)
+    )  # for some reason my numpy version messes up the round function and it returns a np.float.
+    if bins > 300:
+        bins = 100
+
+    # bins = np.arange(max(data) + 1) - 0.5
+    plt.hist(x, bins, color="b", density=False)
+
+    if xticks is not None:
+        plt.xticks(list(range(len(data))), xticks, rotation=45, ha="right")
+
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.savefig(saveto, bbox_inches="tight")
+
+
+def plot_bar(
+    data: List[int],
+    title: str,
+    saveto: str,
+    xlabel: str,
+    xticks: Optional[List[Any]] = None,
+):
+    plt.figure()
+
+    plt.bar(list(range(len(data))), data)
+
+    # plt.yticks(fontsize=20)
+    if xticks is not None:
+        plt.xticks(list(range(len(data))), xticks, rotation=45, ha="right")
+
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.savefig(saveto, bbox_inches="tight")
+
+
+def plot_token_occurencies(
+    data: List[int],
+    title: str,
+    saveto: str,
+    xlabel: str,
+    ylabel: str,
+    xticks: Optional[List[Any]] = None,
+):
+    plt.figure()
+
+    plt.scatter(list(range(len(data))), data, c="b", s=2)
+
+    # # plt.yticks(fontsize=20)
+    # if xticks is not None:
+    #     plt.xticks(list(range(len(data))), xticks, rotation=45, ha="right")
+
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.savefig(saveto, bbox_inches="tight")
+
+
+def plot_images(df: pd.DataFrame, saveto: str):
+    count = 1
+    fig = plt.figure(figsize=(10, 10))
+    npic = df.shape[0]
+    for idx, row in df.iterrows():
+        image_path = row["image"]
+        true_caption = row["caption"]
+        model_caption = row["model_caption"]
+        bleu_s = round(row["bleu_score"], 3)
+        image_name = os.path.basename(image_path)
+
+        img = Image.open(image_path).convert("RGB")
+
+        ax = fig.add_subplot(npic, 2, count, xticks=[], yticks=[])
+        ax.imshow(img)
+        count += 1
+
+        ax = fig.add_subplot(npic, 2, count)
+        plt.axis("off")
+        ax.plot()
+        ax.set_xlim(0, 1)
+        ax.set_ylim(0, 1)
+        ax.text(0, 0.9, f"Image name: {image_name}")
+        ax.text(0, 0.6, f"True Caption: {true_caption}")
+        ax.text(0, 0.4, f"Model Caption: {model_caption}")
+        ax.text(0, 0.2, f"BLEU SCORE: {bleu_s}")
+        count += 1
+
     plt.savefig(saveto, bbox_inches="tight")

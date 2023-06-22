@@ -14,6 +14,7 @@ from torchtext.vocab import GloVe, build_vocab_from_iterator
 from torchtext.vocab.vocab import Vocab
 from tqdm import tqdm
 
+from losses import ASLSingleLabel
 from models import Decoder, Encoder, ImageCaptioningModel
 from plotter import plot_info
 from utils import (
@@ -48,6 +49,7 @@ def eval_model(
     loss_function,
     bleu_n_gram: int,
     device: torch.device,
+    ASL_loss_func: bool,
 ) -> Tuple[float, float]:
     itos = vocab.get_itos()
     pred_sentences = []
@@ -64,9 +66,18 @@ def eval_model(
             model_captions = model_captions.to(device)
 
             outputs = model(images, model_captions, lengths)
-            loss = loss_function(
-                outputs.reshape(-1, outputs.shape[2]), true_captions.reshape(-1)
-            )
+
+            if ASL_loss_func:
+                true_captions_ = true_captions.reshape(-1)
+                outputs_ = outputs.reshape(-1, outputs.shape[2])
+                outputs_ = outputs_[true_captions_ != 0, :]
+                true_captions_ = true_captions_[true_captions_ != 0]
+
+                loss = loss_function(outputs_, true_captions_)
+            else:
+                loss = loss_function(
+                    outputs.reshape(-1, outputs.shape[2]), true_captions.reshape(-1)
+                )
 
             val_losses.append(loss.item())
 
@@ -124,12 +135,6 @@ if __name__ == "__main__":
     model_structure_path = os.path.join(model_path, "model_structure.txt")
     write = []
 
-    # df = pd.read_csv(captions_path)
-
-    # df["new_caption"] = preprocess_texts(captions=df["caption"].tolist())
-    # df.to_csv("seethis.csv", index=False)
-    # exit()
-
     training_set, validation_set, test_set = get_and_create_data(
         output_path=output_path,
         preprocessed_images_output_path=preprocessed_images_output_path,
@@ -137,27 +142,9 @@ if __name__ == "__main__":
         images_path=images_path,
         test_size=0.2,
     )
-    # exit()
 
     # Build the vocab which includes all tokens with at least min_freq occurrences in the texts.
     # Special tokens <PAD> and <UNK> are used for padding sequences and unknown words respectively.
-
-    # from collections import Counter
-
-    # c = Counter()
-    # for tokens in tokens_generator(texts=training_set["caption"].tolist()):
-    #     c.update(tokens)
-    # print(c)
-    # print(c.most_common(10))
-
-    # df = pd.DataFrame(data={"token": list(c.keys()), "count": list(c.values())})
-    # print(df)
-
-    # print(df[df["count"] <= 10])
-    # df = pd.read_csv(captions_path)
-    # df["new_caption"] = preprocess_texts(captions=df["caption"].tolist())
-    # df.to_csv("seethis.csv", index=False)
-    # exit()
     start_token = config["start_token"]
     vocab = build_vocab_from_iterator(
         tokens_generator(texts=training_set["caption"].tolist()),
@@ -220,8 +207,11 @@ if __name__ == "__main__":
     model = ImageCaptioningModel(
         encoder=encoder, decoder=decoder, start_token=start_token, device=device
     ).to(device)
+    if config["ASL_loss_func"]:
+        loss_function = ASLSingleLabel()
+    else:
+        loss_function = torch.nn.CrossEntropyLoss(ignore_index=vocab["<PAD>"])
 
-    loss_function = torch.nn.CrossEntropyLoss(ignore_index=vocab["<PAD>"])
     optimizer = torch.optim.AdamW(
         model.parameters(), lr=config["lr"], weight_decay=config["weight_decay"]
     )
@@ -241,7 +231,6 @@ if __name__ == "__main__":
     max_val_score = np.NINF
     events = {}
 
-    # random_val_image = validation_set.sample(1)
     random_val_image_path = validation_set.iloc[0]["image"]
     random_val_image_true_caption = validation_set.iloc[0]["caption"]
 
@@ -255,8 +244,6 @@ if __name__ == "__main__":
     )
     print("Random val image:", random_val_image_path)
     write.append(f"Caption before training: {random_val_image_caption}\n\n")
-    # print(random_val_image_caption)
-    # exit()
 
     print("Training in:", device)
     # print(vocab.get_stoi())
@@ -278,9 +265,18 @@ if __name__ == "__main__":
             model_captions = model_captions.to(device)
 
             outputs = model(images, model_captions, lengths)
-            loss = loss_function(
-                outputs.reshape(-1, outputs.shape[2]), true_captions.reshape(-1)
-            )
+
+            if config["ASL_loss_func"]:
+                true_captions_ = true_captions.reshape(-1)
+                outputs_ = outputs.reshape(-1, outputs.shape[2])
+                outputs_ = outputs_[true_captions_ != 0, :]
+                true_captions_ = true_captions_[true_captions_ != 0]
+
+                loss = loss_function(outputs_, true_captions_)
+            else:
+                loss = loss_function(
+                    outputs.reshape(-1, outputs.shape[2]), true_captions.reshape(-1)
+                )
 
             loss.backward()
             optimizer.step()
@@ -293,6 +289,7 @@ if __name__ == "__main__":
             loss_function=loss_function,
             device=device,
             bleu_n_gram=config["bleu_n_gram"],
+            ASL_loss_func=config["ASL_loss_func"],
         )
 
         validation_score, validation_loss = eval_model(
@@ -303,6 +300,7 @@ if __name__ == "__main__":
             loss_function=loss_function,
             device=device,
             bleu_n_gram=config["bleu_n_gram"],
+            ASL_loss_func=config["ASL_loss_func"],
         )
         stats_per_epoch["training_loss"].append(training_loss)
         stats_per_epoch["training_score"].append(training_score)
@@ -422,6 +420,7 @@ if __name__ == "__main__":
         loss_function=loss_function,
         device=device,
         bleu_n_gram=config["bleu_n_gram"],
+        ASL_loss_func=config["ASL_loss_func"],
     )
 
     test_results = (

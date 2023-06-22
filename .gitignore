@@ -2,6 +2,7 @@ data
 flickr8k.zip
 inference
 .vector_cache
+report_data
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
