@@ -1,0 +1,60 @@
+476 words were prefilled out of 478 (0.9958)
+
+Image name: /home/azureuser/projects/ImageCaptioning/data/unique_preprocessed_images/1032122270_ea6f0beedb_0.jpg
+True caption: three dogs on grassy hill .
+
+Caption before training: Its look truck its look truck its look truck its its its look parade truck its look truck its look parade truck its look .
+
+Epoch: 1 caption: Man <UNK> <UNK> .
+Epoch: 2 caption: Man <UNK> <UNK> <UNK> .
+Epoch: 3 caption: Man <UNK> <UNK> <UNK> .
+Epoch: 4 caption: Two <UNK> <UNK> <UNK> .
+Epoch: 5 caption: Man <UNK> <UNK> .
+Epoch: 6 caption: Two <UNK> <UNK> <UNK> .
+Epoch: 7 caption: Two <UNK> <UNK> <UNK> .
+Epoch: 8 caption: Dog is <UNK> <UNK> .
+Epoch: 9 caption: Dog is <UNK> <UNK> .
+Epoch: 10 caption: Dog is <UNK> <UNK> .
+Epoch: 11 caption: Two dogs are playing in the water .
+Epoch: 12 caption: Dog <UNK> in the grass .
+Epoch: 13 caption: Dog is running in the grass .
+Epoch: 14 caption: Two dogs are playing in the snow .
+Epoch: 15 caption: Two dogs are playing in the snow .
+Epoch: 16 caption: Man <UNK> <UNK> <UNK> .
+Epoch: 17 caption: Man <UNK> <UNK> .
+Epoch: 18 caption: Two dogs are playing in the grass .
+Epoch: 19 caption: Two dogs are playing in the grass .
+Epoch: 20 caption: Two dogs are playing in the snow .
+Epoch: 21 caption: Man <UNK> on the beach .
+Epoch: 22 caption: Dog is running on the beach .
+Epoch: 23 caption: Two dogs play in the snow .
+Epoch: 24 caption: Man <UNK> on the beach .
+Epoch: 25 caption: Dog <UNK> <UNK> <UNK> .
+Epoch: 26 caption: Two dogs are running in the snow .
+Epoch: 27 caption: Man <UNK> on the beach .
+Epoch: 28 caption: Dog is running through the snow .
+Epoch: 29 caption: Man <UNK> <UNK> .
+Epoch: 30 caption: Man <UNK> on the beach .
+Epoch: 31 caption: Man <UNK> on the beach .
+Epoch: 32 caption: Two dogs play in the snow .
+Epoch: 33 caption: Two dogs play in the snow .
+Epoch: 34 caption: Man <UNK> on the beach .
+Epoch: 35 caption: Man <UNK> on the beach .
+Epoch: 36 caption: Man <UNK> on the beach .
+Epoch: 37 caption: Two dogs play in the snow .
+Epoch: 38 caption: Man <UNK> on the beach .
+Epoch: 39 caption: Man <UNK> on the beach .
+Epoch: 40 caption: Two dogs play in the water .
+Epoch: 41 caption: Two dogs play in the water .
+Epoch: 42 caption: Man and dog playing in the water .
+Epoch: 43 caption: Two dogs run through the water .
+Epoch: 44 caption: Man <UNK> dog on the beach .
+Epoch: 45 caption: Man <UNK> on beach .
+Epoch: 46 caption: Two dogs run through the water .
+Epoch: 47 caption: Two dogs play in the water .
+Epoch: 48 caption: Two dogs play in the water .
+Epoch: 49 caption: Two dogs run through the woods .
+Epoch: 50 caption: Two dogs running on beach .
+
+
+Test loss: 2.913, Test bleu: 0.209

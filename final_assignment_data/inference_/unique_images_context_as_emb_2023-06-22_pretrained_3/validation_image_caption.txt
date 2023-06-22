@@ -1,0 +1,110 @@
+476 words were prefilled out of 478 (0.9958)
+
+Image name: /home/azureuser/projects/ImageCaptioning/data/unique_preprocessed_images/1032122270_ea6f0beedb_0.jpg
+True caption: three dogs on grassy hill .
+
+Caption before training: Gathered each each each each each each each each each each each each each each each each each each each each each each each .
+
+Epoch: 1 caption: Man <UNK> <UNK> .
+Epoch: 2 caption: Man <UNK> <UNK> <UNK> .
+Epoch: 3 caption: Man <UNK> <UNK> <UNK> .
+Epoch: 4 caption: Man <UNK> <UNK> <UNK> .
+Epoch: 5 caption: Man <UNK> <UNK> <UNK> .
+Epoch: 6 caption: Two <UNK> <UNK> <UNK> <UNK> .
+Epoch: 7 caption: Dog in <UNK> <UNK> .
+Epoch: 8 caption: Dog is <UNK> <UNK> .
+Epoch: 9 caption: Dog in the <UNK> .
+Epoch: 10 caption: Dog is <UNK> <UNK> .
+Epoch: 11 caption: Dog is running in the grass .
+Epoch: 12 caption: Dog <UNK> <UNK> <UNK> .
+Epoch: 13 caption: Two dogs are playing in the snow .
+Epoch: 14 caption: Two dogs playing in the snow .
+Epoch: 15 caption: Two dogs playing in the snow .
+Epoch: 16 caption: Dog <UNK> <UNK> <UNK> .
+Epoch: 17 caption: Two dogs are playing in the snow .
+Epoch: 18 caption: Two dogs are playing in the grass .
+Epoch: 19 caption: Man <UNK> <UNK> <UNK> .
+Epoch: 20 caption: Man <UNK> <UNK> .
+Epoch: 21 caption: Two dogs playing in the snow .
+Epoch: 22 caption: Man <UNK> on <UNK> .
+Epoch: 23 caption: Dog running through the grass .
+Epoch: 24 caption: Two dogs are playing in the snow .
+Epoch: 25 caption: Man <UNK> <UNK> .
+Epoch: 26 caption: Dog running through the grass .
+Epoch: 27 caption: Dog running through the snow .
+Epoch: 28 caption: Dog is running through the grass .
+Epoch: 29 caption: Dog is running through the grass .
+Epoch: 30 caption: Man <UNK> <UNK> <UNK> .
+Epoch: 31 caption: Dog running through the grass .
+Epoch: 32 caption: Man is <UNK> on <UNK> .
+Epoch: 33 caption: Dog running through the grass .
+Epoch: 34 caption: Dog is running through the grass .
+Epoch: 35 caption: Man is <UNK> <UNK> <UNK> .
+Epoch: 36 caption: Dog runs through the grass .
+Epoch: 37 caption: Man is <UNK> <UNK> <UNK> .
+Epoch: 38 caption: Dog runs through the grass .
+Epoch: 39 caption: Dog running through the grass .
+Epoch: 40 caption: Dog runs through the grass .
+Epoch: 41 caption: Dog runs through the grass .
+Epoch: 42 caption: Two dogs play in the grass .
+Epoch: 43 caption: Dog runs through the grass .
+Epoch: 44 caption: Dog runs through the grass .
+Epoch: 45 caption: Man is <UNK> <UNK> <UNK> <UNK> .
+Epoch: 46 caption: Dog runs through the grass .
+Epoch: 47 caption: Dog running through the grass .
+Epoch: 48 caption: Dog runs through the grass .
+Epoch: 49 caption: Dog running through the grass .
+Epoch: 50 caption: Dog runs through the grass .
+Epoch: 51 caption: Dog runs through the grass .
+Epoch: 52 caption: Dog runs through the grass .
+Epoch: 53 caption: Dog running through field .
+Epoch: 54 caption: Dog runs through the grass .
+Epoch: 55 caption: Dog runs through the grass .
+Epoch: 56 caption: Two dogs play in the water .
+Epoch: 57 caption: Three dogs play in the grass .
+Epoch: 58 caption: Dog runs through the grass .
+Epoch: 59 caption: Dog running through the water .
+Epoch: 60 caption: Dog runs through the woods .
+Epoch: 61 caption: Dog runs through the grass .
+Epoch: 62 caption: Dog runs through the grass .
+Epoch: 63 caption: Dog runs through the grass .
+Epoch: 64 caption: Dog runs through field .
+Epoch: 65 caption: Dog runs through the grass .
+Epoch: 66 caption: Dog runs through grassy field .
+Epoch: 67 caption: Dog runs through the grass .
+Epoch: 68 caption: Man and dog jump in the water .
+Epoch: 69 caption: Dog runs through the grass .
+Epoch: 70 caption: Dog runs through the grass .
+Epoch: 71 caption: Dog runs through grassy field .
+Epoch: 72 caption: Two dogs play in field .
+Epoch: 73 caption: Dog chases ball in field .
+Epoch: 74 caption: Dog runs through field .
+Epoch: 75 caption: Dog runs through grassy field .
+Epoch: 76 caption: Dog runs through the grass .
+Epoch: 77 caption: Dog runs through the grass .
+Epoch: 78 caption: Dog chases ball in field .
+Epoch: 79 caption: Dog runs through the grass .
+Epoch: 80 caption: Dog chases ball in field .
+Epoch: 81 caption: Two dogs play in field .
+Epoch: 82 caption: Dog chases ball in field .
+Epoch: 83 caption: Dog runs through field .
+Epoch: 84 caption: Dog runs through grassy field .
+Epoch: 85 caption: Dog chases ball in field .
+Epoch: 86 caption: Dog runs through field .
+Epoch: 87 caption: Dog chases ball in field .
+Epoch: 88 caption: Dog runs through field .
+Epoch: 89 caption: Dog chases ball in field .
+Epoch: 90 caption: Dog chases ball in field .
+Epoch: 91 caption: Three dogs jump in field .
+Epoch: 92 caption: Dog chases ball in field .
+Epoch: 93 caption: Dog chases ball in field .
+Epoch: 94 caption: Dog chases ball in field .
+Epoch: 95 caption: Dog chases ball in field .
+Epoch: 96 caption: Dog chases ball in field .
+Epoch: 97 caption: Boy runs through grassy field .
+Epoch: 98 caption: Dog running in field .
+Epoch: 99 caption: Dog chases ball in field .
+Epoch: 100 caption: Dog chases ball in field .
+
+
+Test loss: 2.922, Test bleu: 0.207

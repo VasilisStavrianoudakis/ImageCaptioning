@@ -1,0 +1,60 @@
+476 words were prefilled out of 479 (0.9937)
+
+Image name: /home/azureuser/projects/ImageCaptioning/data/unique_preprocessed_images/1032122270_ea6f0beedb_0.jpg
+True caption: three dogs on grassy hill .
+
+Caption before training: Surfing dressed skateboarding skateboarding dressed skateboarding skateboarding skateboarding skateboarding skateboarding skateboarding skateboarding skateboarding skateboarding skateboarding skateboarding skateboarding skateboarding skateboarding skateboarding skateboarding skateboarding skateboarding skateboarding .
+
+Epoch: 1 caption: Man <UNK> <UNK> .
+Epoch: 2 caption: Man <UNK> <UNK> <UNK> .
+Epoch: 3 caption: Two <UNK> <UNK> <UNK> .
+Epoch: 4 caption: Man <UNK> <UNK> .
+Epoch: 5 caption: Man <UNK> <UNK> .
+Epoch: 6 caption: Two dog in the <UNK> .
+Epoch: 7 caption: Dog in the <UNK> .
+Epoch: 8 caption: Dog in the <UNK> .
+Epoch: 9 caption: Dog is <UNK> <UNK> .
+Epoch: 10 caption: Dog is <UNK> in the snow .
+Epoch: 11 caption: Two dogs are playing in the grass .
+Epoch: 12 caption: Dog is running in the grass .
+Epoch: 13 caption: Two dogs are running in the grass .
+Epoch: 14 caption: Dog is running through the water .
+Epoch: 15 caption: Two dogs are playing in the snow .
+Epoch: 16 caption: Man <UNK> on the beach .
+Epoch: 17 caption: Man <UNK> <UNK> <UNK> .
+Epoch: 18 caption: Man <UNK> <UNK> .
+Epoch: 19 caption: Man <UNK> on the beach .
+Epoch: 20 caption: Man <UNK> on the beach .
+Epoch: 21 caption: Man <UNK> on the beach .
+Epoch: 22 caption: Man is <UNK> on the beach .
+Epoch: 23 caption: Dog is running through the grass .
+Epoch: 24 caption: Man <UNK> <UNK> <UNK> <UNK> .
+Epoch: 25 caption: Man is <UNK> on the beach .
+Epoch: 26 caption: Man is <UNK> on the beach .
+Epoch: 27 caption: Man is <UNK> <UNK> <UNK> .
+Epoch: 28 caption: Man is <UNK> on the beach .
+Epoch: 29 caption: Two dogs are running through the grass .
+Epoch: 30 caption: Man is <UNK> through the water .
+Epoch: 31 caption: Man is <UNK> on the beach .
+Epoch: 32 caption: Man is <UNK> on <UNK> path .
+Epoch: 33 caption: Two dogs are running through the water .
+Epoch: 34 caption: Man is <UNK> dog in the water .
+Epoch: 35 caption: Two dogs are running through the water .
+Epoch: 36 caption: Two dogs are <UNK> through the water .
+Epoch: 37 caption: Two dogs are running through the water .
+Epoch: 38 caption: Man is walking through the ocean .
+Epoch: 39 caption: Two people are <UNK> on <UNK> .
+Epoch: 40 caption: Two dogs are running through the water .
+Epoch: 41 caption: Man and two dogs <UNK> the water .
+Epoch: 42 caption: Two dogs are running through water .
+Epoch: 43 caption: Two dogs are <UNK> stick in the water .
+Epoch: 44 caption: Two dogs are running through the water .
+Epoch: 45 caption: Two dogs are running through the water .
+Epoch: 46 caption: Two dogs running the water .
+Epoch: 47 caption: Two dogs are running through the water .
+Epoch: 48 caption: Two dogs play the water .
+Epoch: 49 caption: Two dogs play in the water .
+Epoch: 50 caption: Two people walking along the shore .
+
+
+Test loss: 3.016, Test bleu: 0.191

@@ -1,0 +1,58 @@
+Image name: /home/azureuser/projects/ImageCaptioning/data/unique_preprocessed_images/1032122270_ea6f0beedb_0.jpg
+True caption: three dogs on grassy hill .
+
+Caption before training: Costumes puppies forest for river backyard high doing pose black puppies holds forest puppies river laying laying laying laying laying laying laying laying laying .
+
+Epoch: 1 caption: Two <UNK> <UNK> .
+Epoch: 2 caption: Two <UNK> <UNK> <UNK> .
+Epoch: 3 caption: Man <UNK> <UNK> <UNK> .
+Epoch: 4 caption: Man <UNK> <UNK> .
+Epoch: 5 caption: Man <UNK> <UNK> .
+Epoch: 6 caption: Dog is <UNK> in the snow .
+Epoch: 7 caption: Dog is running in the snow .
+Epoch: 8 caption: Dog is running in the grass .
+Epoch: 9 caption: Dog runs through the grass .
+Epoch: 10 caption: Dog <UNK> in the snow .
+Epoch: 11 caption: Two dogs are playing in the snow .
+Epoch: 12 caption: Two dogs playing in the grass .
+Epoch: 13 caption: Two dogs are playing in the grass .
+Epoch: 14 caption: Dog <UNK> <UNK> .
+Epoch: 15 caption: Man <UNK> <UNK> .
+Epoch: 16 caption: Two dogs play in the snow .
+Epoch: 17 caption: Two dogs play in the grass .
+Epoch: 18 caption: Dog <UNK> <UNK> .
+Epoch: 19 caption: Man <UNK> <UNK> .
+Epoch: 20 caption: Man <UNK> on the beach .
+Epoch: 21 caption: Man and dog <UNK> on the beach .
+Epoch: 22 caption: Dog is running through the grass .
+Epoch: 23 caption: Dog runs through the grass .
+Epoch: 24 caption: Dog is running through the grass .
+Epoch: 25 caption: Man and dog <UNK> on the grass .
+Epoch: 26 caption: Dog runs through the grass .
+Epoch: 27 caption: Dog <UNK> in the grass .
+Epoch: 28 caption: Dog is running through the woods .
+Epoch: 29 caption: Dog is running through the grass .
+Epoch: 30 caption: Dog jumps over the water .
+Epoch: 31 caption: Man and dog are playing in the water .
+Epoch: 32 caption: Dog runs through the grass .
+Epoch: 33 caption: Two dogs play in the grass .
+Epoch: 34 caption: Dog is running through the water .
+Epoch: 35 caption: Dog is running through the water .
+Epoch: 36 caption: Two dogs <UNK> through the water .
+Epoch: 37 caption: Dog runs through the grass .
+Epoch: 38 caption: Dog is running through the water .
+Epoch: 39 caption: Dog runs through the grass .
+Epoch: 40 caption: Two dogs play in the grass .
+Epoch: 41 caption: Dog is running through the grass .
+Epoch: 42 caption: Dog is running through field .
+Epoch: 43 caption: Dog is running through the grass .
+Epoch: 44 caption: Two dogs play in the grass .
+Epoch: 45 caption: Dog runs through the grass .
+Epoch: 46 caption: Dog is <UNK> through the water .
+Epoch: 47 caption: Dog runs through the grass .
+Epoch: 48 caption: Three dogs play in the grass .
+Epoch: 49 caption: Dog runs through the grass .
+Epoch: 50 caption: Dog runs through the grass .
+
+
+Test loss: 2.962, Test bleu: 0.196

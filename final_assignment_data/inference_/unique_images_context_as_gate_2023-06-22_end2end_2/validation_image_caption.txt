@@ -1,0 +1,58 @@
+Image name: /home/azureuser/projects/ImageCaptioning/data/unique_preprocessed_images/1032122270_ea6f0beedb_0.jpg
+True caption: three dogs on grassy hill .
+
+Caption before training: City laying city laying for male trampoline puddle for for small ice for house drink against city grey football for for male small house .
+
+Epoch: 1 caption: Two <UNK> <UNK> .
+Epoch: 2 caption: Man <UNK> <UNK> <UNK> .
+Epoch: 3 caption: Man <UNK> <UNK> .
+Epoch: 4 caption: Two dogs in the <UNK> .
+Epoch: 5 caption: Man <UNK> <UNK> .
+Epoch: 6 caption: Man <UNK> <UNK> .
+Epoch: 7 caption: Man <UNK> <UNK> .
+Epoch: 8 caption: Dog is running through the snow .
+Epoch: 9 caption: Two dogs play in the snow .
+Epoch: 10 caption: Two dogs are playing in the snow .
+Epoch: 11 caption: Two dogs play in the snow .
+Epoch: 12 caption: Dog <UNK> through the water .
+Epoch: 13 caption: Two dogs are playing in the snow .
+Epoch: 14 caption: Man <UNK> on the beach .
+Epoch: 15 caption: Two dogs playing in the snow .
+Epoch: 16 caption: Two dogs play in the grass .
+Epoch: 17 caption: Man <UNK> <UNK> .
+Epoch: 18 caption: Man <UNK> on the beach .
+Epoch: 19 caption: Man <UNK> on the beach .
+Epoch: 20 caption: Man <UNK> on the beach .
+Epoch: 21 caption: <unk> <UNK> <UNK> .
+Epoch: 22 caption: Man <UNK> <UNK> .
+Epoch: 23 caption: Two dogs are playing in the grass .
+Epoch: 24 caption: Man is <UNK> on the beach .
+Epoch: 25 caption: Man is <UNK> through the ocean .
+Epoch: 26 caption: Man is <UNK> on the beach .
+Epoch: 27 caption: Man and dog are running in field .
+Epoch: 28 caption: Two dogs are running through field .
+Epoch: 29 caption: Man is <UNK> on the beach .
+Epoch: 30 caption: Two dogs are playing in the grass .
+Epoch: 31 caption: Two people <UNK> the water .
+Epoch: 32 caption: Two dogs <UNK> each other .
+Epoch: 33 caption: Two dogs <UNK> each other .
+Epoch: 34 caption: Two dogs are <UNK> through grassy field .
+Epoch: 35 caption: Two dogs are running through field .
+Epoch: 36 caption: Two dogs are running through field .
+Epoch: 37 caption: Two people <UNK> on the shore .
+Epoch: 38 caption: Two people are <UNK> on the shore .
+Epoch: 39 caption: Two people are <UNK> up in the woods .
+Epoch: 40 caption: Two dogs play in the grass .
+Epoch: 41 caption: Two people are <UNK> through grassy area .
+Epoch: 42 caption: Two people <UNK> on the shore .
+Epoch: 43 caption: Two people are <UNK> through <UNK> .
+Epoch: 44 caption: Two people are <UNK> up in the ocean .
+Epoch: 45 caption: Two people <UNK> through the water .
+Epoch: 46 caption: Three people are hiking up hill .
+Epoch: 47 caption: Two people are <UNK> up in grassy hill .
+Epoch: 48 caption: Three people are <UNK> up hill .
+Epoch: 49 caption: Two people <UNK> up the hill .
+Epoch: 50 caption: Two people are <UNK> up in the road .
+
+
+Test loss: 2.937, Test bleu: 0.2

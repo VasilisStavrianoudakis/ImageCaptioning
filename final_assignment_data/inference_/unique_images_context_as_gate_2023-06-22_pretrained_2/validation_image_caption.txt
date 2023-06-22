@@ -1,0 +1,60 @@
+476 words were prefilled out of 479 (0.9937)
+
+Image name: /home/azureuser/projects/ImageCaptioning/data/unique_preprocessed_images/1032122270_ea6f0beedb_0.jpg
+True caption: three dogs on grassy hill .
+
+Caption before training: Bench bench bench bench bench bench bench bench bench bench bench bench bench bench bench bench bench bench bench bench bench bench bench bench .
+
+Epoch: 1 caption: Man <UNK> <UNK> .
+Epoch: 2 caption: Two <UNK> <UNK> <UNK> .
+Epoch: 3 caption: Man <UNK> <UNK> <UNK> .
+Epoch: 4 caption: Man <UNK> <UNK> <UNK> .
+Epoch: 5 caption: Man <UNK> <UNK> .
+Epoch: 6 caption: Man in <UNK> <UNK> .
+Epoch: 7 caption: Two dogs are <UNK> in the water .
+Epoch: 8 caption: Two dogs playing in the water .
+Epoch: 9 caption: Dog is <UNK> <UNK> .
+Epoch: 10 caption: Dog is running in the grass .
+Epoch: 11 caption: Man <UNK> <UNK> .
+Epoch: 12 caption: Two dogs are playing in the grass .
+Epoch: 13 caption: Man in <UNK> <UNK> on the beach .
+Epoch: 14 caption: Two dogs are playing in the grass .
+Epoch: 15 caption: Man in <UNK> <UNK> .
+Epoch: 16 caption: Man <UNK> <UNK> .
+Epoch: 17 caption: Dog runs through the water .
+Epoch: 18 caption: Man <UNK> on the beach .
+Epoch: 19 caption: Dog is running through the grass .
+Epoch: 20 caption: Man <UNK> on the beach .
+Epoch: 21 caption: Man <UNK> <UNK> .
+Epoch: 22 caption: Dog <UNK> through the water .
+Epoch: 23 caption: Man <UNK> in the air .
+Epoch: 24 caption: Man <UNK> <UNK> in the ocean .
+Epoch: 25 caption: Man <UNK> on the beach .
+Epoch: 26 caption: Man <UNK> on the beach .
+Epoch: 27 caption: Man in <UNK> <UNK> .
+Epoch: 28 caption: Man is <UNK> on the <UNK> .
+Epoch: 29 caption: Man <UNK> in the water .
+Epoch: 30 caption: Man is <UNK> in the air .
+Epoch: 31 caption: Man in <UNK> <UNK> on the beach .
+Epoch: 32 caption: Man in <UNK> near water .
+Epoch: 33 caption: Man in <UNK> shirt is running .
+Epoch: 34 caption: Man in <UNK> near water .
+Epoch: 35 caption: Man in <UNK> <UNK> .
+Epoch: 36 caption: Man in white shirt is <UNK> in the woods .
+Epoch: 37 caption: Man in <UNK> <UNK> near water .
+Epoch: 38 caption: Man and white dog in field .
+Epoch: 39 caption: Man in <UNK> shirt is running through field .
+Epoch: 40 caption: People are <UNK> in field .
+Epoch: 41 caption: People are <UNK> in the woods .
+Epoch: 42 caption: Man in <UNK> shirt standing in field .
+Epoch: 43 caption: People are <UNK> in field .
+Epoch: 44 caption: People are <UNK> in field .
+Epoch: 45 caption: Man <UNK> in field .
+Epoch: 46 caption: Man in green shirt is near <UNK> .
+Epoch: 47 caption: People are <UNK> in field .
+Epoch: 48 caption: People are <UNK> in field .
+Epoch: 49 caption: People are <UNK> in field .
+Epoch: 50 caption: People are <UNK> in field .
+
+
+Test loss: 2.959, Test bleu: 0.202

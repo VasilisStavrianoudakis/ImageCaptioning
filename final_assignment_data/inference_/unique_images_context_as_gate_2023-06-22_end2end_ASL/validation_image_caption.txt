@@ -1,0 +1,58 @@
+Image name: /home/azureuser/projects/ImageCaptioning/data/unique_preprocessed_images/1032122270_ea6f0beedb_0.jpg
+True caption: three dogs on grassy hill .
+
+Caption before training: Background climbing house six after after after after after after after after after after after after after after after after after after after after .
+
+Epoch: 1 caption: Man <UNK> .
+Epoch: 2 caption: Man <UNK> <UNK> .
+Epoch: 3 caption: Man <UNK> <UNK> <UNK> .
+Epoch: 4 caption: Man <UNK> <UNK> .
+Epoch: 5 caption: Two dogs playing in the water .
+Epoch: 6 caption: Dog is <UNK> <UNK> .
+Epoch: 7 caption: Dog is running in the water .
+Epoch: 8 caption: Dog is <UNK> <UNK> <UNK> .
+Epoch: 9 caption: Man in <UNK> <UNK> .
+Epoch: 10 caption: Man <UNK> <UNK> .
+Epoch: 11 caption: Man <UNK> <UNK> <UNK> .
+Epoch: 12 caption: Two dogs play in the grass .
+Epoch: 13 caption: Man in <UNK> <UNK> <UNK> .
+Epoch: 14 caption: Man <UNK> <UNK> <UNK> .
+Epoch: 15 caption: Man <UNK> <UNK> <UNK> .
+Epoch: 16 caption: Two dogs play in the snow .
+Epoch: 17 caption: Man <UNK> <UNK> on the beach .
+Epoch: 18 caption: Man is <UNK> on the beach .
+Epoch: 19 caption: Man in <UNK> <UNK> <UNK> <UNK> .
+Epoch: 20 caption: Man <UNK> <UNK> on the beach .
+Epoch: 21 caption: Man in <UNK> <UNK> <UNK> <UNK> .
+Epoch: 22 caption: Man in white shirt is running on the beach .
+Epoch: 23 caption: Man in <UNK> <UNK> <UNK> <UNK> .
+Epoch: 24 caption: Man in white shirt is standing on rock .
+Epoch: 25 caption: Man in white shirt is standing in the ocean .
+Epoch: 26 caption: Man in white shirt is climbing rock wall .
+Epoch: 27 caption: Man and dog <UNK> in the water .
+Epoch: 28 caption: Man in white shirt is running in the grass .
+Epoch: 29 caption: Man in white shirt is running in the grass .
+Epoch: 30 caption: Dog running through the grass .
+Epoch: 31 caption: Man and dog playing in the grass .
+Epoch: 32 caption: Man is <UNK> into water into pool .
+Epoch: 33 caption: Man and dog playing in the grass .
+Epoch: 34 caption: Two dogs run through field .
+Epoch: 35 caption: Three people in field near the ocean .
+Epoch: 36 caption: Two dogs play in the grass .
+Epoch: 37 caption: Man in white shirt is running in field .
+Epoch: 38 caption: Two dogs run through grassy area .
+Epoch: 39 caption: Two people are running along path .
+Epoch: 40 caption: Two people are in green yard .
+Epoch: 41 caption: Three people in green field .
+Epoch: 42 caption: Two children playing in lake .
+Epoch: 43 caption: Two people are in green desert .
+Epoch: 44 caption: Three people standing on rocky hill .
+Epoch: 45 caption: Two people in green boat .
+Epoch: 46 caption: Two children run through grassy area .
+Epoch: 47 caption: Woman walks along beach near ocean .
+Epoch: 48 caption: Three people in green boat .
+Epoch: 49 caption: Three people walking down hill .
+Epoch: 50 caption: Three people standing in the woods .
+
+
+Test loss: 2.631, Test bleu: 0.213

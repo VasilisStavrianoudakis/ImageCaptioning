@@ -1,0 +1,60 @@
+476 words were prefilled out of 479 (0.9937)
+
+Image name: /home/azureuser/projects/ImageCaptioning/data/unique_preprocessed_images/1032122270_ea6f0beedb_0.jpg
+True caption: three dogs on grassy hill .
+
+Caption before training: Golden surfing long biker biker biker biker biker biker biker biker biker biker biker biker biker biker biker biker biker biker biker biker biker .
+
+Epoch: 1 caption: Two <UNK> <UNK> .
+Epoch: 2 caption: Man <UNK> <UNK> .
+Epoch: 3 caption: Man <UNK> <UNK> <UNK> .
+Epoch: 4 caption: Man <UNK> <UNK> .
+Epoch: 5 caption: Two dog in <UNK> .
+Epoch: 6 caption: Two dogs in the <UNK> .
+Epoch: 7 caption: Two dogs are <UNK> in the water .
+Epoch: 8 caption: Two dogs are playing in the water .
+Epoch: 9 caption: Dog is running in the snow .
+Epoch: 10 caption: Dog is running through the water .
+Epoch: 11 caption: Dog <UNK> <UNK> <UNK> .
+Epoch: 12 caption: Two dogs are playing in the snow .
+Epoch: 13 caption: Two dogs playing in the snow .
+Epoch: 14 caption: Two dogs are playing in the snow .
+Epoch: 15 caption: Two dogs are playing in the snow .
+Epoch: 16 caption: Two dogs are playing in the snow .
+Epoch: 17 caption: Man <UNK> on the beach .
+Epoch: 18 caption: Man <UNK> <UNK> .
+Epoch: 19 caption: Man <UNK> <UNK> .
+Epoch: 20 caption: Man <UNK> on <UNK> .
+Epoch: 21 caption: Man <UNK> <UNK> .
+Epoch: 22 caption: Man <UNK> on the beach .
+Epoch: 23 caption: Man <UNK> on the beach .
+Epoch: 24 caption: Man <UNK> <UNK> .
+Epoch: 25 caption: Man is <UNK> <UNK> <UNK> <UNK> .
+Epoch: 26 caption: Man is <UNK> on <UNK> <UNK> .
+Epoch: 27 caption: Man is <UNK> on the beach .
+Epoch: 28 caption: Man is <UNK> on the beach .
+Epoch: 29 caption: Man is <UNK> through the ocean .
+Epoch: 30 caption: Man is <UNK> on <UNK> hill .
+Epoch: 31 caption: Man in <UNK> <UNK> in the woods .
+Epoch: 32 caption: Man is <UNK> <UNK> <UNK> .
+Epoch: 33 caption: Man is <UNK> through the grass .
+Epoch: 34 caption: Man is <UNK> up rocky hill .
+Epoch: 35 caption: Man <UNK> on the beach .
+Epoch: 36 caption: Two people are <UNK> through the water .
+Epoch: 37 caption: Man <UNK> dog .
+Epoch: 38 caption: Man <UNK> dog through the grass .
+Epoch: 39 caption: Man is hiking through the woods .
+Epoch: 40 caption: Man and dog <UNK> through the grass .
+Epoch: 41 caption: Man in black shirt is running on hill .
+Epoch: 42 caption: The people are <UNK> through the water .
+Epoch: 43 caption: Two people are running through field .
+Epoch: 44 caption: Man <UNK> dog through <UNK> .
+Epoch: 45 caption: People are running through field .
+Epoch: 46 caption: Man <UNK> out hill on beach .
+Epoch: 47 caption: Man is <UNK> green green <UNK> .
+Epoch: 48 caption: Man and dog <UNK> through grass .
+Epoch: 49 caption: People are running towards the beach .
+Epoch: 50 caption: Two people walking through the grass .
+
+
+Test loss: 2.671, Test bleu: 0.198

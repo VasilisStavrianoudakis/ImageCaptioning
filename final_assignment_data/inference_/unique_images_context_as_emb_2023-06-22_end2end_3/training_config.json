@@ -1,0 +1,18 @@
+{
+    "epochs": 100,
+    "batch_size": 256,
+    "lr": 0.0001,
+    "weight_decay": 0,
+    "patience": -1,
+    "pretrained": false,
+    "freeze": false,
+    "decoder_params": {
+        "embed_size": 300,
+        "hidden_size": 2048,
+        "num_layers": 1,
+        "dropout_prob": 0.1,
+        "vocab_size": 478
+    },
+    "unfreeze_scheduler": null,
+    "vocab_min_freq": 10
+}

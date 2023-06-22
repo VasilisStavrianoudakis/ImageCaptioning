@@ -1,0 +1,108 @@
+Image name: /home/azureuser/projects/ImageCaptioning/data/unique_preprocessed_images/1032122270_ea6f0beedb_0.jpg
+True caption: three dogs on grassy hill .
+
+Caption before training: Competition women golden mud mud competition competition competition girls competition competition competition girls competition competition competition girls competition competition competition girls competition competition competition .
+
+Epoch: 1 caption: Man <UNK> <UNK> .
+Epoch: 2 caption: Man <UNK> <UNK> <UNK> .
+Epoch: 3 caption: Two <UNK> <UNK> <UNK> .
+Epoch: 4 caption: Man <UNK> <UNK> <UNK> <UNK> .
+Epoch: 5 caption: Two dogs in the <UNK> .
+Epoch: 6 caption: Two dogs playing in the water .
+Epoch: 7 caption: Dog <UNK> in the snow .
+Epoch: 8 caption: Dog is running through the grass .
+Epoch: 9 caption: Dog <UNK> in the snow .
+Epoch: 10 caption: Dog <UNK> <UNK> <UNK> .
+Epoch: 11 caption: Dog running through the grass .
+Epoch: 12 caption: Dog <UNK> <UNK> .
+Epoch: 13 caption: Dog running through the grass .
+Epoch: 14 caption: Dog <UNK> in the snow .
+Epoch: 15 caption: Two dogs play in the snow .
+Epoch: 16 caption: Dog runs through the snow .
+Epoch: 17 caption: Man <UNK> <UNK> <UNK> .
+Epoch: 18 caption: Man <UNK> on the beach .
+Epoch: 19 caption: Two dogs are playing in the snow .
+Epoch: 20 caption: Man <UNK> on the beach .
+Epoch: 21 caption: Man <UNK> on the beach .
+Epoch: 22 caption: Man <UNK> <UNK> .
+Epoch: 23 caption: Man <UNK> <UNK> .
+Epoch: 24 caption: Man <UNK> .
+Epoch: 25 caption: Two dogs playing in the snow .
+Epoch: 26 caption: Man <UNK> <UNK> .
+Epoch: 27 caption: Man <UNK> .
+Epoch: 28 caption: Man is <UNK> <UNK> <UNK> .
+Epoch: 29 caption: Man <UNK> .
+Epoch: 30 caption: Two dogs are playing in the snow .
+Epoch: 31 caption: Two dogs are playing in the grass .
+Epoch: 32 caption: Man and dog are <UNK> in the snow .
+Epoch: 33 caption: Man and dog .
+Epoch: 34 caption: Two dogs are running through field .
+Epoch: 35 caption: Man is <UNK> <UNK> <UNK> .
+Epoch: 36 caption: Two dogs play in the grass .
+Epoch: 37 caption: Man and dog <UNK> on <UNK> .
+Epoch: 38 caption: Two dogs play in the grass .
+Epoch: 39 caption: Two dogs are playing with stick in field .
+Epoch: 40 caption: Two dogs play in field .
+Epoch: 41 caption: Man and dog are <UNK> in the water .
+Epoch: 42 caption: Two dogs are running through grassy field .
+Epoch: 43 caption: Two dogs are running through field .
+Epoch: 44 caption: Man and dog are running in field .
+Epoch: 45 caption: Man is <UNK> up <UNK> .
+Epoch: 46 caption: Two dogs are <UNK> stick in field .
+Epoch: 47 caption: Two dogs play in field .
+Epoch: 48 caption: Two dogs are <UNK> stick in field .
+Epoch: 49 caption: Two dogs play in the grass .
+Epoch: 50 caption: Two dogs play in the grass .
+Epoch: 51 caption: Two dogs are running through field .
+Epoch: 52 caption: Two dogs are running through grassy field .
+Epoch: 53 caption: Three dogs play in the grass .
+Epoch: 54 caption: Two dogs play in the grass .
+Epoch: 55 caption: Two dogs are <UNK> stick in field .
+Epoch: 56 caption: Two dogs are <UNK> stick in field .
+Epoch: 57 caption: Two dogs play catch on <UNK> .
+Epoch: 58 caption: Two dogs are <UNK> stick in field .
+Epoch: 59 caption: Two dogs play catch frisbee .
+Epoch: 60 caption: Two dogs are <UNK> stick in field .
+Epoch: 61 caption: Two dogs play on <UNK> .
+Epoch: 62 caption: Two dogs are <UNK> stick in field .
+Epoch: 63 caption: Two dogs are <UNK> stick in field .
+Epoch: 64 caption: Three dogs play by the ocean .
+Epoch: 65 caption: Three dogs play by fence .
+Epoch: 66 caption: Two dogs are <UNK> stick in field .
+Epoch: 67 caption: Three dogs play by the ocean .
+Epoch: 68 caption: Two dogs are running down hill .
+Epoch: 69 caption: Two dogs are running through grassy field .
+Epoch: 70 caption: Three dogs run through the grass .
+Epoch: 71 caption: Three dogs play by lake .
+Epoch: 72 caption: Three dogs play by lake .
+Epoch: 73 caption: Three dogs run through the water .
+Epoch: 74 caption: Three dogs play by lake .
+Epoch: 75 caption: Three dogs play by the ball .
+Epoch: 76 caption: Three dogs run through the woods .
+Epoch: 77 caption: Three dogs play by pond .
+Epoch: 78 caption: Two dogs are <UNK> stick in the ocean .
+Epoch: 79 caption: Three dogs play by red ball .
+Epoch: 80 caption: Three dogs run along the shore .
+Epoch: 81 caption: Three dogs run through the woods .
+Epoch: 82 caption: Three dogs play by lake .
+Epoch: 83 caption: Three dogs play by pond .
+Epoch: 84 caption: Three dogs run through the grass .
+Epoch: 85 caption: Three dogs play by the water .
+Epoch: 86 caption: Three dogs run through the grass .
+Epoch: 87 caption: Three dogs running through the woods .
+Epoch: 88 caption: Three dogs running along fence .
+Epoch: 89 caption: Three dogs run through the grass .
+Epoch: 90 caption: Three dogs running through the woods .
+Epoch: 91 caption: Three dogs run through the water .
+Epoch: 92 caption: Three dogs run through the woods .
+Epoch: 93 caption: Three dogs run through the water .
+Epoch: 94 caption: Three dogs run through the grass .
+Epoch: 95 caption: Three dogs run through the grass .
+Epoch: 96 caption: Three dogs run through the grass .
+Epoch: 97 caption: Three dogs run through the woods .
+Epoch: 98 caption: Three dogs play by pond .
+Epoch: 99 caption: Three dogs running through the woods .
+Epoch: 100 caption: Three dogs running through the woods .
+
+
+Test loss: 2.894, Test bleu: 0.204
