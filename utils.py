@@ -6,6 +6,7 @@ import re
 from math import ceil
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+import numpy as np
 import pandas as pd
 import torch
 from num2words import num2words
@@ -91,9 +92,9 @@ def preprocess_texts(captions: List[str]) -> List[str]:
         for caption in captions
     ]
 
-    captions = [
-        caption if caption[-1] == "." else caption + " ." for caption in captions
-    ]
+    for idx, caption in enumerate(captions):
+        if caption:
+            captions[idx] = caption if caption[-1] == "." else caption + " ."
 
     return captions
 
@@ -256,6 +257,10 @@ def get_and_create_data(
         image_captions["caption"] = preprocess_texts(
             captions=image_captions["caption"].tolist()
         )
+
+        # Drop the data with an empty caption.
+        image_captions["caption"].replace("", np.nan, inplace=True)
+        image_captions.dropna(subset=["caption"], inplace=True)
 
         image_captions["lengths"] = [
             len(caption.split()) for caption in image_captions["caption"].tolist()

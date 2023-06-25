@@ -5,7 +5,10 @@ from typing import Iterator, Tuple
 
 import numpy as np
 import torch
+from losses import ASLSingleLabel
+from models import Decoder, Encoder, ImageCaptioningModel
 from PIL import Image
+from plotter import plot_info
 from torchinfo import summary
 from torchmetrics.functional import bleu_score
 
@@ -13,10 +16,6 @@ from torchmetrics.functional import bleu_score
 from torchtext.vocab import GloVe, build_vocab_from_iterator
 from torchtext.vocab.vocab import Vocab
 from tqdm import tqdm
-
-from losses import ASLSingleLabel
-from models import Decoder, Encoder, ImageCaptioningModel
-from plotter import plot_info
 from utils import (
     CustomDataLoader,
     freeze_or_unfreeze_layers,
