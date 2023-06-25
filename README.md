@@ -2,8 +2,6 @@
 
 ## **About this project**
 
-
-
 ![lstm_info](./final_assignment_data/image_captioning-lstm_cell_as_gate.jpg)
 
 ![model_arch](./final_assignment_data/image_captioning-context_as_gate_inference.jpg)
