@@ -24,7 +24,7 @@ Before you get started, make sure that you have downloaded and placed the data i
 
 ## **How to train a model**
 
-1. Create a new python enviroment. *Note: It is suggested to use a `Python version >= 3.9`*
+1. Create a new Python environment. *Note: It is suggested to use a `Python version >= 3.9`*
 2. `pip install -r requirements.txt` to install the required packages.
 3. Use the `config.json` to change all the important parameters of the training process.
 4. Run the `train.py` script to train, evaluate and save a model.
