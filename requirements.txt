@@ -8,3 +8,4 @@ nltk==3.8.1
 matplotlib==3.7.1
 num2words==0.5.12
 torchinfo==1.8.0
+gradio==3.35.2
